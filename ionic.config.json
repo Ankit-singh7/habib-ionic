@@ -1,5 +1,7 @@
 {
   "name": "habib-ionic",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

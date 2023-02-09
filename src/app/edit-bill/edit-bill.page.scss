@@ -1,0 +1,45 @@
+
+ion-title{
+    // ion-img{
+    // width: 7.7rem;
+    // margin:auto;
+    // vertical-align: middle
+    // }
+}
+ion-toolbar{
+    // --padding: 7px 0;
+    //--min-height:49px 
+    --background: #367677;
+    --color: #ffff;
+    --min-height:55px 
+}
+ion-title{
+    padding: 0
+}
+ion-button{
+        ion-icon{
+        font-size: 21px
+    }
+}
+ion-menu-button{
+    height: 30px;
+}
+ion-menu-button{
+color:white;
+}
+.back-btn{
+        position: absolute
+    }
+
+
+.back-btn{
+    ion-icon{
+        font-size: 30px;
+    color:#ffffff;
+    }
+    
+    margin-left: 0;
+    // margin-top: 10px;
+
+}
+

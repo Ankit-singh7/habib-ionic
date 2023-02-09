@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar mode="ios">
+    <ng-container *ngIf="activatedRoute !== '/home'">
+       <ion-buttons slot="start" >
+        <ng-container *ngIf="activatedRoute === '/con/dashboard' || 
+                             activatedRoute === '/con/billing' || 
+                             activatedRoute === '/con/billing-list' ||
+                             activatedRoute === 'con/session' ||
+                             activatedRoute === '/con/setting' ||
+                             activatedRoute === '/con/session' ||
+                             activatedRoute === '/con/closing-balance' ||
+                             activatedRoute === '/tabs/queue' ||
+                             activatedRoute === '/tabs/cook' ||
+                             activatedRoute === '/tabs/dispatch'||
+                             activatedRoute === '/con/appointment-list'||
+                             activatedRoute === '/con/service-sales'||
+                             activatedRoute === '/con/product-sales'||
+                             activatedRoute === '/con/create-appointment'">
+          
+          <ion-menu-button mode="ios" autoHide="false">
+          </ion-menu-button>
+        </ng-container>
+        <ng-container *ngIf="activatedRoute === '/con/billing-view' ||
+                             activatedRoute === '/con/email-validation' ||
+                             activatedRoute === '/con/password-reset' ||
+                             activatedRoute === '/con/change-password'||
+                             activatedRoute === '/con/edit-bill'||
+                             activatedRoute === '/con/appointment-edit'">
+               <ion-button class="back-btn" mode="md" (click)="goback()">
+                <ion-icon name="chevron-back"></ion-icon>
+            </ion-button>
+          </ng-container>
+        </ion-buttons>
+    </ng-container>
+    <!-- <ng-container *ngIf="activatedRoute === '/con/home'">
+      <a href="javascript:void(0)" slot="end" class="sign ion-padding-horizontal" routerLink="/login">Sign In</a>
+    </ng-container> -->
+   <ng-container *ngIf="activatedRoute !== '/con/home'">
+    <ion-title >{{title}}</ion-title>
+    </ng-container>
+  </ion-toolbar>
+</ion-header>
+

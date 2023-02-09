@@ -1,0 +1,89 @@
+ion-content{
+    height: 100px;
+}
+
+
+
+p{
+    color: #2c3847;
+}
+
+ion-icon{
+    font-size: 25px;
+}
+
+
+
+
+    .flex_row {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row; 
+    flex-direction: row;
+    }
+
+button {
+    background: transparent;
+}
+
+
+button:focus {
+    outline: none;
+    }
+
+
+
+
+    ion-segment-button{
+        --border-radius:0;
+        border-right:0;
+        border-top:0;
+        border-left: 0;
+      }
+      ion-segment-button{
+        ion-label{
+          position: absolute;
+          left: 10px;
+        }
+      }
+      
+      .segment-button-checked{
+        ion-label{
+        color: rgb(77, 73, 73);
+        font-size: medium;
+      }
+      }
+      ion-segment-button{
+        ion-label{
+          color: #fff;
+          font-size: medium;
+        }
+      }
+
+.tog-back {
+    background-color: #39bdd9!important;
+    border-radius: 0px !important;
+}
+
+.base-color{
+  background-color: #ddf0fb;
+}
+
+.employee-dropdown{
+  max-width: 79%;
+  margin-left:-20px;
+  margin-top: -10px;
+  margin-bottom: -14px;
+}
+
+
+.employee-dropdown-amount{
+  max-width: 100%;
+  margin-left:-20px;
+  margin-top: -44px;
+  margin-bottom: -14px;
+}
+
+.custom-total{
+  margin-top: 0px;
+}

@@ -1,0 +1,80 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>billing</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <!-- <ion-col size="6">
+        <ion-item lines="full">
+          <ionic-selectable placeholder="Payment Mode" [(ngModel)]="selectedPaymentMode" [items]="payment" itemValueField="id"
+            itemTextField="name" [canSearch]="true" (onChange)="paymentChange($event)" headerColor="danger">
+      
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="close-circle"></ion-icon>
+            </ng-template>
+      
+            <ng-template ionicSelectableTitleTemplate>
+              Payment Mode
+            </ng-template>
+      
+          </ionic-selectable>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-item lines="full">
+          <ionic-selectable placeholder="Employee" [(ngModel)]="selectedEmployee" [items]="employeeList" itemValueField="user_id"
+            itemTextField="name" [canSearch]="true" (onChange)="employeeChange($event)" headerColor="danger">
+      
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="close-circle"></ion-icon>
+            </ng-template>
+      
+            <ng-template ionicSelectableTitleTemplate>
+              Select Employee
+            </ng-template>
+      
+          </ionic-selectable>
+        </ion-item>
+      </ion-col> -->
+      <ion-col size="12">
+        <ion-searchbar placeholder="Search by Customer" [(ngModel)]="search" name="search" (ionChange)="searchedText()" mode="md"></ion-searchbar>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+     <ng-container *ngIf="appointmentList.length>0; else noidea">
+       
+       <ion-list *ngFor="let item of appointmentList | filter: 'customer_name' :search">
+      <ion-item lines="full">
+      <ion-label>
+
+        <h2 slot="start">{{item?.customer_name?item?.customer_name:'Not Mentioned'}}</h2>
+        <p><b>Booking Amount: &#x20B9; {{item.booking_amount}}</b></p>
+        <p><b>Appointment Date: {{item.appointment_date}}</b></p>
+        <a href="tel:{{item.phone?item.phone:'2323443223'}}">
+          <ion-button mode="ios" size="small" color="tertiary" routerLink="/con/appointment-edit"  [queryParams]="{id:item.appointment_id}">
+            <ion-icon slot="start" mode="md" name="create"></ion-icon>
+            Edit
+          </ion-button>
+        </a>
+        <ion-button mode="ios" size="small" color="danger" (click)="deleteAppointment(item.appointment_id)">
+          <ion-icon slot="start" mode="md" name="trash"></ion-icon>
+          Delete
+        </ion-button>
+      </ion-label>
+
+    </ion-item>
+        </ion-list>
+</ng-container>
+<ng-template #noidea>
+  <ion-item lines="none" class="mar" mode="ios" detail="false" rippleEffect="true">
+
+    <ion-label style="color: #2c3847;font-weight:'bold'" class="ion-text-center">No Pending Appointments</ion-label>
+ 
+  </ion-item>
+  
+</ng-template>
+</ion-content>

@@ -1,0 +1,85 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Service Sales Report</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+
+
+
+              <ion-col size="12">
+        <ion-searchbar placeholder="Search by Service Name" [(ngModel)]="search" name="search" (ionChange)="searchedText()" mode="md"></ion-searchbar>
+      </ion-col>
+
+
+
+
+        
+
+        <ion-col size="6">
+          <ion-item lines="full">
+            <ionic-selectable placeholder="Employee" [(ngModel)]="selectedEmployee" [items]="employeeList" itemValueField="user_id"
+              itemTextField="name" [canSearch]="true" (onChange)="employeeChange($event)" headerColor="danger">
+              <ng-template ionicSelectableCloseButtonTemplate>
+                <ion-icon name="close-circle"></ion-icon>
+              </ng-template>
+        
+              <ng-template ionicSelectableTitleTemplate>
+                Employee
+              </ng-template>
+        
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-item lines="full">
+            <ionic-selectable placeholder="Branch" [(ngModel)]="selectedBranch" [items]="branchList" itemValueField="id"
+              itemTextField="name" [canSearch]="true" (onChange)="branchChange($event)" headerColor="danger">
+        
+              <ng-template ionicSelectableCloseButtonTemplate>
+                <ion-icon name="close-circle"></ion-icon>
+              </ng-template>
+        
+              <ng-template ionicSelectableTitleTemplate>
+                Branch
+              </ng-template>
+        
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-datetime [placeholder]="startDate" [pickerOptions]="startDateOption"  [max]="today" ></ion-datetime>
+        </ion-col>
+        <ion-col size="6">
+          <ion-datetime [placeholder]="endDate" [pickerOptions]="endDateOption"  [max]="today"></ion-datetime>
+        </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+     <ng-container *ngIf="reportList.length>0; else noidea">
+       
+       <ion-list *ngFor="let item of reportList | filter: 'service_name' :search">
+      <ion-item lines="full">
+      <ion-label>
+
+        <h2 slot="start">{{item?.service_name}}</h2>
+          <p><b>Count: <span style="color:red">{{item.quantity}}</span></b></p>
+
+      </ion-label>
+
+    </ion-item>
+        </ion-list>
+</ng-container>
+<ng-template #noidea>
+  <ion-item lines="none" class="mar" mode="ios" detail="false" rippleEffect="true">
+
+    <ion-label style="color: #2c3847;font-weight:'bold'" class="ion-text-center">No Sales For Today</ion-label>
+ 
+  </ion-item>
+  
+</ng-template>
+</ion-content>

@@ -1,0 +1,120 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>billing-view</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="billDetail">
+
+    <ion-row>
+      <ion-col>
+        <ion-item lines="full">
+         <ion-label>
+           <p>Bill No: <b>{{billDetail.bill_id}}</b></p>
+         </ion-label>
+       </ion-item>
+       <ion-item lines="full">
+         <ion-label>
+           <p>Created on: <b>{{date}}</b></p>
+         </ion-label>
+       </ion-item>
+        <ion-item lines="full">
+          <ion-label>
+            <p>Name: <b>{{billDetail.customer_name?billDetail.customer_name: 'Not Mentioned'}}</b></p>
+          </ion-label>
+       </ion-item>
+       <ng-container *ngIf="role === 'operator' || role === 'admin'">
+
+         <ion-item lines="full">
+          <ion-label>
+            <p>Whatsapp No: <b>{{billDetail.customer_phone?billDetail.customer_phone: 'Not Mentioned'}}</b></p>
+          </ion-label>
+       </ion-item>
+       <ion-item lines="full">
+        <ion-label>
+          <p>Alternative No: <b>{{billDetail.customer_alternative_phone?billDetail.customer_alternative_phone:'Not Provided'}}</b></p>
+        </ion-label>
+     </ion-item>
+     <ion-item lines="full">
+      <ion-label>
+        <p>Address: <b>{{billDetail.customer_address?billDetail.customer_address: 'Not Provided'}}</b></p>
+      </ion-label>
+   </ion-item>
+       </ng-container>
+      <ion-item lines="full">
+        <ion-label>
+          <p>Payment Mode: <b>{{billDetail.payment_mode}}</b></p>
+        </ion-label>
+      </ion-item>
+
+     <ion-card>
+       <ion-card-content>
+        <ion-card-header>
+          <ion-card-subtitle><p><B>Service/Product Details</B></p></ion-card-subtitle>
+          <ion-card-title>Total cost: <B>&#x20B9; {{billDetail.total_price}}</B> </ion-card-title>
+        </ion-card-header>
+
+         <ion-row class="bod">
+           <ion-col size="12">
+         <ng-container *ngFor="let item of billDetail.services">
+   
+               <ion-item lines="full">
+                <ion-label>
+                  <p>Service Name: <b>{{item.service_name | titlecase}}</b></p>
+                  <p>Employee: <b>{{item.employee_name}}</b></p>
+                  <p>Head Count: <b>{{item.quantity}}</b></p>
+                  <p>Price: <b>{{item.total}}</b></p>
+                </ion-label>
+                </ion-item>
+                
+               </ng-container>
+               <ng-container *ngFor="let item of billDetail.products">
+   
+                <ion-item lines="full">
+                 <ion-label>
+                   <p>Product Name: <b>{{item.product_name | titlecase}}</b></p>
+                   <p>Employee: <b>{{item.employee_name}}</b></p>
+                   <p>Quantity: <b>{{item.quantity}}</b></p>
+                   <p>Price: <b>{{item.total}}</b></p>
+                 </ion-label>
+                 </ion-item>
+                 
+                </ng-container>
+             </ion-col>
+           </ion-row>
+       </ion-card-content>
+     </ion-card>
+
+      <!-- <ion-item lines="full">
+        <ion-label>
+          <p>Total Cost: <b>&#x20B9; {{billDetail.total_price}}</b></p>
+        </ion-label>
+      </ion-item> -->
+
+  
+
+
+
+    
+           
+           
+          
+            <!-- <a href="tel:{{item.phone?item.phone:'2323443223'}}">
+              <ion-button mode="ios" size="small" color="tertiary">
+                <ion-icon slot="start" mode="ios" name="print"></ion-icon>
+                Print
+              </ion-button>
+            </a>
+            <ion-button mode="ios" size="small" color="tertiary" routerLink="/con/billing-view" [queryParams]="{id:item.bill_id}">
+              <ion-icon slot="start" mode="md" name="eye"></ion-icon>
+              View
+            </ion-button> -->
+
+    
+        <!-- </ion-item> -->
+      </ion-col>
+    </ion-row>
+  </ng-container>
+
+</ion-content>

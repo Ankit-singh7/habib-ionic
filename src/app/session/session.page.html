@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>session</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ng-container *ngIf="sessionDetail;else elseBlock">
+
+      <ion-row>
+        <ion-col size="12">
+          <ion-card style="--background:'#54c5c3';border-radius: 10px; color:white">
+            <ion-card-content>
+              <h2>Opening Balance: <B>&#x20B9; {{sessionDetail?.session_amount}}</B></h2>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="12">
+          <ion-card style="--background:'#bd7eb3';border-radius: 10px; color:white">
+            <ion-card-content>
+              <h2>Drawer Balance: <B>&#x20B9; {{sessionDetail?.drawer_balance}}</B></h2>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="12">
+          <ion-card style="--background:'#bd7eb3';border-radius: 10px; color:white">
+            <ion-card-content>
+              <h2>Withdrawn: <B>&#x20B9; {{sessionDetail?.withdrawn}}</B></h2>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+
+        
+        <!-- <ion-col size="12">
+          <ion-card style="--background:'#4ba2eb';border-radius: 10px; color:white">
+            <ion-card-content>
+              <h2>Close Balance: <B>&#x20B9; {{sessionDetail?.drawer_balance}}.00</B></h2>
+            </ion-card-content>
+          </ion-card>
+        </ion-col> -->
+      </ion-row>
+    </ng-container>
+    <!-- <ng-container *ngIf="createSession">
+      <ion-col size="12">
+        <ion-button expand="full" shape="round" color="tertiary"  (click)="withdrawCash(withdraw)">Create New Session</ion-button>
+      </ion-col>
+    </ng-container> -->
+  </ion-grid>
+  <ng-template #elseBlock>
+    <ion-col>
+      <ion-text color="dark" class="ion-text-center">
+        <p>No Active Session</p>
+      </ion-text>
+    </ion-col>
+  </ng-template>
+     
+
+</ion-content>
+<ng-container *ngIf="isWithdrawn==='false'">
+
+  <ion-footer *ngIf="sessionDetail"  style="background: #f6f6f6;">
+    <form id="MValidform" role="form" #MValidForm="ngForm">
+    <ion-grid>
+      <ion-row>
+  
+          <ion-col size="12">
+    
+            <ion-item mode="ios" lines="full" >
+              <ion-input type="text" placeholder="Enter Amount"
+              inputmode="numeric" [(ngModel)]="withdraw" name="amount" required></ion-input>
+          </ion-item>
+          </ion-col>
+          <ng-container *ngIf="showError">
+  
+            <ion-col>
+              <ion-text color="danger" class="ion-text-center">
+                <p>Amount greater than Drawer balance.</p>
+              </ion-text>
+            </ion-col>
+          </ng-container>
+  
+  
+            <ion-col size="12">
+              <ion-button expand="full" shape="round" color="tertiary" [disabled]="!MValidForm.valid" (click)="withdrawCash(withdraw)">Withdraw Cash</ion-button>
+            </ion-col>
+  
+        </ion-row>
+      </ion-grid>
+    </form>
+  </ion-footer>
+</ng-container>

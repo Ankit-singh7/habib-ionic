@@ -1,0 +1,102 @@
+ion-searchbar{
+    --icon-color:#6e439b;
+    
+}
+
+ion-fab{
+    bottom: 40px
+}
+ion-fab-button{
+    ion-icon{
+        font-size: 60px;
+        font-weight:200
+    }
+}
+.mr-3{ 
+    margin-right: 15px ;
+ }
+ .mr-1{ margin-right:5px }
+.plus{ padding: 12px }
+ ion-label h2{
+    font-weight:600
+ }
+ ion-note{
+     color: #9b9b9b;
+     font-size: 14px
+ }
+ ion-item{
+    ion-icon{
+        vertical-align: middle;
+        color: inherit
+    }
+ }
+ ion-item{
+     ion-button{
+        font-size: .7rem;
+     }
+ }
+
+ ion-item-divider{
+    color: #9b9b9b;
+    background: #ffffff;
+ }
+
+ ion-button{
+     ion-icon{
+         font-size:14px;
+     }
+ }
+
+ ion-item-option{
+    --background: rgb(246,205,86);
+ }
+ ion-toggle{
+    margin-top: -30px;
+    padding-right: 0;
+ }
+
+ .disabled {
+     color: #cccccc;
+ }
+ .tog{ 
+    position: absolute;
+    right: 60px;
+    font-size: .8rem;
+    top:15px
+ }
+
+ h3{
+    position: relative;
+}
+.float-div{
+    position: absolute;
+    right: 0;
+    top: -5px;
+
+}
+.float-div-lft{
+    position: absolute;
+    right: 50px;
+    top: -5px;
+}
+.btn-fixed{
+    position: absolute;
+    bottom: 15px;
+    display: inline-block;
+    margin: auto;
+    left: 0;
+    right: 0;
+    width: 185px;
+    z-index:1000;
+    
+    }
+.extra-marg{
+    margin-bottom:80px
+}
+
+.float-div{
+    position: absolute;
+    right:0;
+    top:0;
+    font-size: 2rem;
+}

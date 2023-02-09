@@ -1,0 +1,364 @@
+
+
+<ng-container *ngIf="showDetail">
+  <ion-header>
+    <ion-toolbar mode="ios">
+         <ion-buttons slot="start" >
+            
+          <ion-button class="back-btn" mode="md" routerLink="/con/billing-list">
+            <ion-icon name="chevron-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title >Edit Bill</ion-title>
+    </ion-toolbar>
+    </ion-header>
+  <ion-content *ngIf="billDetail">
+
+
+    <ion-row class="ion-text-center ion-padding-horizontal">
+      <ion-col  style="color: #2c3847;"><h4>Edit Payment Details</h4></ion-col>
+  </ion-row>
+  
+  <ion-row class=" ion-padding-horizontal">
+    <ion-col  style="color: #2c3847;">
+      <ion-item>
+        <ion-label>Dual Payment</ion-label>
+        <ion-toggle [(ngModel)]="dual_payment" (ionChange)="onDualChange()"></ion-toggle>
+      </ion-item>
+    </ion-col>
+</ion-row>
+  <ion-list>
+      <ion-item mode="ios" lines="full" >
+          <ion-label mode="ios"  position="stacked" style="color: #2c3847;"> Name</ion-label>
+          <ion-input type="text" placeholder="" [(ngModel)]="billDetail.customer_name" name="customer"></ion-input>
+      </ion-item>
+  
+  
+      <!-- <ion-item mode="ios" lines="full" >
+          <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Email Address (optional)</ion-label>
+          <ion-input type="email" placeholder="" ></ion-input>
+      </ion-item> -->
+  
+      <ion-item mode="ios" lines="full" >
+          <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Whatsapp Number</ion-label>
+          <ion-input type="text" inputmode="numeric" placeholder="" maxlength="18" [(ngModel)]="billDetail.customer_phone" name="phone"></ion-input>
+      </ion-item>
+      <ion-item mode="ios" lines="full" >
+        <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Alternative Mobile Number (Optional)</ion-label>
+        <ion-input type="text" inputmode="numeric" placeholder="" maxlength="18" [(ngModel)]="billDetail.customer_alternative_phone" name="phone2"></ion-input>
+    </ion-item>
+  
+      <ion-item mode="ios" lines="full" >
+        <ion-label mode="ios"  position="stacked"style="color: #2c3847;" >Address (optional) </ion-label>
+        <ion-input type="text" placeholder="" [(ngModel)]="billDetail.customer_address" name="address"></ion-input>
+    </ion-item>
+  
+     
+  <!-- <ion-item mode="ios" lines="full" >
+    <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Select Employee</ion-label>
+    <ionic-selectable  [(ngModel)]="selectedEmployee" [items]="employeeList" itemValueField="user_id"
+    itemTextField="name" [canSearch]="true" (onChange)="employeeChange($event)" headerColor="danger">
+  
+    <ng-template ionicSelectableCloseButtonTemplate>
+      <ion-icon name="close-circle"></ion-icon>
+    </ng-template>
+  
+    <ng-template ionicSelectableTitleTemplate>
+      Select Employee
+    </ng-template>
+  
+  </ionic-selectable>
+  </ion-item> -->
+  
+  <ng-container *ngIf="!dual_payment">
+
+    <ng-container *ngIf="!netBanking">
+    
+      <ion-item mode="ios" lines="full" >
+        <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Payment Option </ion-label>
+        <ionic-selectable  [(ngModel)]="selectedPaymentMode" [items]="payment" itemValueField="id"
+        itemTextField="name" [canSearch]="true" (onChange)="paymentChange($event,'payment_1')" headerColor="danger">
+    
+        <ng-template ionicSelectableCloseButtonTemplate>
+          <ion-icon name="close-circle"></ion-icon>
+        </ng-template>
+    
+        <ng-template ionicSelectableTitleTemplate>
+          Select Payment Option
+        </ng-template>
+    
+      </ionic-selectable>
+    </ion-item>
+    </ng-container>
+    
+    <ng-container *ngIf="netBanking">
+      <ion-item mode="ios" lines="full" >
+        <ion-label mode="ios"  position="stacked"style="color: #2c3847;" >Payment Option</ion-label>
+        <ion-input type="text" placeholder=""  readonly>Net Banking</ion-input>
+    </ion-item>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="dual_payment">
+    <ion-item mode="ios" lines="full">
+        <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Payment Option 1</ion-label>
+        <ionic-selectable  [(ngModel)]="selectedPaymentMode" [items]="payment" itemValueField="id"
+        itemTextField="name" [canSearch]="true" (onChange)="paymentChange($event,'payment_1')" headerColor="danger">
+    
+        <ng-template ionicSelectableCloseButtonTemplate>
+          <ion-icon name="close-circle"></ion-icon>
+        </ng-template>
+    
+        <ng-template ionicSelectableTitleTemplate>
+          Select Payment Option
+        </ng-template>
+    
+      </ionic-selectable>
+    </ion-item>
+    <ion-item mode="ios" lines="full">
+        <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Payment Option 2</ion-label>
+        <ionic-selectable  [(ngModel)]="selectedPaymentMode_2" [items]="payment" itemValueField="id"
+        itemTextField="name" [canSearch]="true" (onChange)="paymentChange($event,'payment_2')" headerColor="danger">
+    
+        <ng-template ionicSelectableCloseButtonTemplate>
+          <ion-icon name="close-circle"></ion-icon>
+        </ng-template>
+    
+        <ng-template ionicSelectableTitleTemplate>
+          Select Payment Option
+        </ng-template>
+    
+      </ionic-selectable>
+    </ion-item>
+
+</ng-container>
+  
+  
+  
+  
+  
+  </ion-list>
+  </ion-content>
+  <ion-footer align-title="center" class="bar-assertive" style="background: #f6f6f6;"  *ngIf="billDetail">
+    <ion-row class="ion-justify-content-center ion-margin-bottom" style="background: #f6f6f6;">
+       <ng-container  *ngIf="formError">
+        <ion-col size="12" >
+          <ion-item style="--background: #f6f6f6;">
+  
+            <p style="color:#e3402d;" class="ion-text-center">{{message}}</p> 
+          </ion-item>
+        </ion-col>
+      </ng-container>
+      <ion-col size="12" >
+        <ion-button strong expand="block" mode="ios" color="success" (click)="showDetail = false">
+          Preview Bill
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-footer>
+</ng-container>
+
+
+
+
+
+
+<!-- Bill -->
+
+<ng-container *ngIf="!showDetail">
+  <ion-header>
+    <ion-toolbar mode="ios">
+         <ion-buttons slot="start" >
+            
+          <ion-button class="back-btn" mode="md" (click)="showDetail = true">
+            <ion-icon name="chevron-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title >Preview Bill</ion-title>
+    </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div id="bill" style="width:100%;padding:5px; background-color:#ddf0fb" *ngIf="billDetail">
+        <div>
+          <div sytle="color:black">
+            <h4 style="text-align:center; font-weight: bolder;">HABIB SALON SPA BEAUTY</h4>
+            <p style="text-align:center;font-size: 10px;">{{branchDetail.branch_address}}
+              <br><span style="font-weight: bold">All Days Open {{branchDetail.branch_start_timing}} to {{branchDetail.branch_end_timing}}</span>
+              <!-- <br>{{}} -->
+              <br><span style="font-size:12px;font-weight: bolder;">
+                {{branchDetail.branch_phone}}
+              </span>
+            </p>
+          </div>
+        </div>
+        <div style="display:inline-block;width:100%;border-bottom:1px solid grey;height:33px;">
+          <div style="text-align:left">
+            <p style="font-size:11px"><span style="font-weight: bold;">Token No.</span>: {{billDetail.token_id}}</p>
+          </div>
+         </div>
+        <div style="display:inline-block;width:50%;border-bottom:1px solid grey;height:33px;">
+          <div style="text-align:left">
+            <p style="font-size:11px"><span style="font-weight: bold;">Bill No.</span>: {{billDetail.bill_id}}</p>
+          </div>
+        </div>
+        <div style="display:inline-block; width:50% ;border-bottom:1px solid grey;height:33px;">
+          <div style="text-align:right">
+            <p style="font-size:11px"><span style="font-weight: bold;">Date</span>: {{formattedDate}}</p>
+          </div>
+        </div>
+        <div style="border-bottom:1px dotted black;height:14px;">
+          <p style="font-size:11px"><span style="font-weight: bold;">Name</span>: {{billDetail.customer_name}}</p>
+        </div>
+        <div style="border-bottom:1px dotted black;height:14px;">
+          <p style="font-size:11px"><span style="font-weight: bold;">Phone</span>: {{billDetail.customer_phone}}</p>
+        </div>
+        <div style="border-bottom:1px dotted black;height:14px;">
+          <p style="font-size:11px"><span style="font-weight: bold;">Address</span>:
+            {{billDetail.customer_address?billDetail.customer_address: ''}}</p>
+        </div>
+        <ng-container *ngIf="billDetail.services.length">
+  
+          <div style="display:inline-block;width:47%;border:1px solid grey;height:25px;margin-left:1%">
+            <p style="text-align:center;font-weight:bold;font-size:11px;">
+              Services
+            </p>
+          </div>
+          <div style="display:inline-block;width:30%;border:1px solid grey;height:25px">
+            <p style="text-align:center;font-weight:bold;font-size:11px;">
+              Head Count
+            </p>
+          </div>
+          <div style="display:inline-block;width:20%;border:1px solid grey;height:25px">
+            <p style="text-align:center;font-weight:bold;font-size:11px;">
+              Price
+            </p>
+          </div>
+          <ng-container *ngFor="let item of billDetail.services">
+  
+            <div style="display:inline-block;width:47%;border:1px solid grey;height:25px;margin-left:1%">
+              <p style="text-align:center;font-size:11px;">
+                {{item.service_name}}
+              </p>
+            </div>
+            <div style="display:inline-block;width:30%;border:1px solid grey;height:25px">
+              <p style="text-align:center;font-size:11px;">
+                {{item.quantity}}
+              </p>
+            </div>
+            <div style="display:inline-block;width:20%;border:1px solid grey;height:25px">
+              <p style="text-align:center;font-size:11px;">
+                &#8377; {{item.total}}
+              </p>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="billDetail.products.length">
+  
+          <div style="display:inline-block;width:47%;border:1px solid grey;height:25px;margin-left:1%">
+            <p style="text-align:center;font-weight:bold;font-size:11px;">
+              Products
+            </p>
+          </div>
+          <div style="display:inline-block;width:30%;border:1px solid grey;height:25px">
+            <p style="text-align:center;font-weight:bold;font-size:11px;">
+              Quantity
+            </p>
+          </div>
+          <div style="display:inline-block;width:20%;border:1px solid grey;height:25px">
+            <p style="text-align:center;font-weight:bold;font-size:11px;">
+              Price
+            </p>
+          </div>
+          <ng-container *ngFor="let item of billDetail.products">
+  
+            <div style="display:inline-block;width:47%;border:1px solid grey;height:25px;margin-left:1%">
+              <p style="text-align:center;font-size:11px;">
+                {{item.product_name}}
+              </p>
+            </div>
+            <div style="display:inline-block;width:30%;border:1px solid grey;height:25px">
+              <p style="text-align:center;font-size:11px;">
+                {{item.quantity}}
+              </p>
+            </div>
+            <div style="display:inline-block;width:20%;border:1px solid grey;height:25px">
+              <p style="text-align:center;font-size:11px;">
+                &#8377; {{item.total}}
+              </p>
+            </div>
+          </ng-container>
+        </ng-container>
+        <div
+        style="display:inline-block;font-weight:bold;width:59%;font-size:11px;border:1px solid grey;height:25px;margin-left:1%">
+        <p style="text-align:right;margin-right:1%">Grand Total</p>
+      </div>
+      <div style="display:inline-block;font-weight:bold;width:38%;font-size:11px;border:1px solid grey;height:25px;">
+        <p style="text-align:center">{{billDetail.total_price}}</p>
+      </div>
+        <div
+          style="display:inline-block;font-weight:bold;width:59%;font-size:11px;border:1px solid grey;height:25px;margin-left:1%">
+          <p style="text-align:right;margin-right:1%">Booking Amount</p>
+        </div>
+        <div style="display:inline-block;font-weight:bold;width:38%;font-size:11px;border:1px solid grey;height:25px;">
+          <p style="text-align:center">{{billDetail.booking_amount}}</p>
+        </div>
+        <div
+        style="display:inline-block;font-weight:bold;width:59%;font-size:11px;border:1px solid grey;height:25px;margin-left:1%">
+        <p style="text-align:right;margin-right:1%">Amount to pe paid</p>
+      </div>
+      <div style="display:inline-block;font-weight:bold;width:38%;font-size:11px;border:1px solid grey;height:25px;">
+        <p style="text-align:center">&#8377; {{billDetail.amount_to_be_paid}}</p>
+      </div>
+      <ng-container *ngIf="!dual_payment">
+
+        <div style="display:inline-block;font-weight:bold;width:59%;font-size:11px;border:1px solid grey;height:25px;margin-left:1%">
+          <p style="text-align:right;margin-right:1%">Pay Mode</p>
+        </div>
+        <div style="display:inline-block;font-weight:bold;width:38%;font-size:11px;border:1px solid grey;height:25px;">
+          <p style="text-align:center">{{selectedPaymentMode.name}}</p>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="dual_payment">
+
+        <div style="display:inline-block;font-weight:bold;width:59%;font-size:11px;border:1px solid grey;height:25px;margin-left:1%">
+          <p style="text-align:right;margin-right:1%">Pay Mode 1</p>
+        </div>
+        <div style="display:inline-block;font-weight:bold;width:38%;font-size:11px;border:1px solid grey;height:25px;">
+          <p style="text-align:center">{{selectedPaymentMode.name}}-{{billDetail.split_amount_1}}</p>
+        </div>
+        <div style="display:inline-block;font-weight:bold;width:59%;font-size:11px;border:1px solid grey;height:25px;margin-left:1%">
+          <p style="text-align:right;margin-right:1%">Pay Mode 2</p>
+        </div>
+        <div style="display:inline-block;font-weight:bold;width:38%;font-size:11px;border:1px solid grey;height:25px;">
+          <p style="text-align:center">{{selectedPaymentMode_2.name}}-{{billDetail.split_amount_2}}</p>
+        </div>
+      </ng-container>
+      
+        <div style="width:100%;;margin-left:1%">
+          <p style="font-size:11px;"><b>#</b> {{branchDetail.footer_1}}</p>
+          <p style="font-size:11px;"><b>#</b> {{branchDetail.footer_2}}</p>
+          <p style="font-size:11px;"><b>#</b> {{branchDetail.footer_3}}</p>
+        </div>
+        <div>
+          <p style="text-align: center;"><b>Thank You Visit Again.</b></p>
+        </div>
+  
+      </div>
+    </ion-content>
+
+    <ion-footer align-title="center" class="bar-assertive" style="background: #f6f6f6;">
+      <ion-row>
+        <ion-col size="6" class="pl-3">
+          <ion-button strong expand="block" mode="ios" fill="outline" color="tertiary" (click)="editBill()">
+            Save
+          </ion-button>
+        </ion-col>
+        <ion-col size="6" class="pl-3">
+          <ion-button strong expand="block" mode="ios" color="success" (click)="editandSendBill()">
+            Save & Send
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-footer>
+</ng-container>
+

@@ -1,0 +1,37 @@
+
+ion-menu {
+    --ion-background-color: #2c3847;
+    --ion-text-color: #ffff;
+  
+    ion-toolbar {
+      --background: #2c3847;
+    }
+
+
+  
+    ion-list {/* optional, but it needs when you use gradient as a background color.*/
+      background: transparent;
+    }
+  }
+
+    ion-item{
+        margin-bottom:1rem;
+
+        ion-img{
+            width:24px;
+            height: auto;
+        }
+
+        .size {
+            width:24px;
+            height: auto;
+            color: black;
+        }
+
+        ion-label {
+            color: #fff;
+            margin-left: 8px;
+        }
+
+    
+    }

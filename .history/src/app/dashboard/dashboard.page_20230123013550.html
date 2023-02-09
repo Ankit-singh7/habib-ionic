@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+<ion-grid>
+  <ion-row>
+    <ion-col size="12">
+      <ion-card style="--background:'#f8c877';border-radius: 10px; color:white;border-right:30px solid rgb(204 187 96)">
+        <ion-card-content>
+          <h2>Total Sale : <B>&#x20B9; {{total}}</B></h2>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+    <ng-container *ngIf="role === 'operator'">
+      <ion-col size="12">
+        <ion-card style="--background:'#54c5c3';border-radius: 10px; color:white;;border-right:30px solid  rgb(112 165 160);" routerLink="/con/billing">
+          <ion-card-content>
+            <h1><ion-icon name="cart-outline"></ion-icon></h1>
+            <h2><B>Go To Billing / Invoice</B></h2>
+         </ion-card-content>
+        </ion-card>
+      </ion-col>
+   </ng-container>
+    <ion-col size="12">
+      <ion-card style="--background:'#bd7eb3';border-radius: 10px; color:white;;border-right:30px solid rgb(130 104 150);" routerLink="/con/billing-list">
+        <ion-card-content>
+          <h1><ion-icon name="document-outline"></ion-icon></h1>
+          <h2><B>Go To Billing List</B></h2>
+       </ion-card-content>
+      </ion-card>
+    </ion-col>
+    <ng-container *ngIf="role === 'operator'">
+      
+      <ion-col size="12">
+        <ion-card style="--background:'#4ba2eb';border-radius: 10px; color:white;;border-right:30px solid rgb(86 135 169);" routerLink="/con/session">
+          <ion-card-content>
+            <h1><ion-icon name="copy-outline"></ion-icon></h1>
+            <h2><B>Go To Session status</B></h2>
+         </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="12">
+        <ion-card style="--background:'#97d39d';border-radius: 10px; color:white" routerLink="/con/closing-balance">
+          <ion-card-content>
+            <h1><ion-icon name="cash"></ion-icon></h1>
+            <h2><B>Add Closing Balance</B></h2>
+         </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ng-container>
+    <!-- <ng-container *ngIf="role === 'addddd'">
+
+      <ion-col size="12">
+        <ion-card style="--background:'#f29f40';border-radius: 10px; color:white" routerLink="/tabs/queue">
+          <ion-card-content>
+            <h1><ion-icon name="pizza"></ion-icon></h1>
+            <h2><B>Go To Chef's Section</B></h2>
+         </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ng-container> -->
+  </ion-row>
+</ion-grid>
+</ion-content>

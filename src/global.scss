@@ -24,3 +24,36 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+html.md{ 
+    --ion-default-font: 'Roboto', sans-serif !important;
+}
+
+.h-100{ min-height: 100%; }
+.searchbar-input {
+    border-radius: 10px !important;
+    height: 35px !important;
+    font-size: .75rem !important;
+    padding-right: 40px !important;
+    padding-left: 40px !important;
+    box-shadow:0 0 10px #00000017 !important;
+}
+.searchbar-search-icon.sc-ion-searchbar-md{
+    top:8px
+}
+.sc-ion-searchbar-md{ margin-top: 2px }
+.select-icon-inner{
+    opacity: 1 !important;
+    color: #000 !important
+}
+.swiper-container-horizontal>.swiper-pagination-bullets, .swiper-pagination-custom, .swiper-pagination-fraction{
+    bottom: 4px;
+}
+.swiper-pagination-bullet{
+    height: 10px;
+    width: 10px;
+}
+.swiper-pagination-bullet-active{
+    background:#6e439b
+}
+

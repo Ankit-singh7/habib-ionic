@@ -1,0 +1,107 @@
+<ion-app>
+  <ion-split-pane contentId="main-content" class="my-sidemenu">
+    <ion-menu contentId="main-content" type="overlay" swipe-gesture="false"
+      *ngIf="this.activatedRoute !== '/home' && this.activatedRoute !== '/password-reset'">
+      <ion-header class="ion-no-border">
+        <ion-toolbar>
+          <ion-button fill="clear" (click)="closeMenu()" class="close">
+            <ion-icon name="close" color="danger"></ion-icon>
+          </ion-button>
+        </ion-toolbar>
+
+      </ion-header>
+      <ion-content class="ion-no-paddingl">
+        <ion-list>
+          <ion-menu-toggle auto-hide="false">
+
+            <ion-item lines="none" mode="ios" detail="false" routerLink="/con/dashboard" rippleEffect="true">
+              <ion-icon name="speedometer-outline"></ion-icon>
+
+              <ion-label color="primary">My Dashboard</ion-label>
+            </ion-item>
+            <ng-container *ngIf="role === 'operator'">
+
+              <ion-item lines="none"   mode="ios" detail="false" rippleEffect="true" routerLink="/con/billing">
+  
+                <ion-icon name="cart-outline"></ion-icon>
+                <ion-label color="primary">Create Bill / Invoice</ion-label>
+              </ion-item>
+            </ng-container>
+
+
+
+
+            <ion-item rippleEffect="true" detail="false" lines="none" mode="ios" routerLink="/con/billing-list">
+              <ion-icon name="document-outline"></ion-icon>
+              <ion-label color="primary">Billing List</ion-label>
+            </ion-item>
+            <ng-container *ngIf="role === 'operator'">
+
+              <ion-item rippleEffect="true" detail="false" lines="none" mode="ios" routerLink="/con/create-appointment">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <ion-label color="primary">Create Appointment</ion-label>
+              </ion-item>
+            </ng-container>
+            <ng-container *ngIf="role === 'admin'">
+              <ion-item lines="none"   mode="ios" detail="false" rippleEffect="true" routerLink="/con/service-sales">
+  
+                <ion-icon name="document-outline"></ion-icon>
+                <ion-label color="primary">Service Sales Report</ion-label>
+              </ion-item>
+              <ion-item lines="none"   mode="ios" detail="false" rippleEffect="true" routerLink="/con/product-sales">
+  
+                <ion-icon name="document-outline"></ion-icon>
+                <ion-label color="primary">Product Sales Report</ion-label>
+              </ion-item>
+            </ng-container>
+
+
+            <ng-container *ngIf="role === 'operator' || role === 'admin'">
+
+              <ion-item rippleEffect="true" detail="false" lines="none" mode="ios" routerLink="/con/appointment-list">
+                <ion-icon name="document-outline"></ion-icon>
+                <ion-label color="primary">Appointment List</ion-label>
+              </ion-item>
+            </ng-container>
+
+            <!-- <ion-item rippleEffect="true" detail="false" lines="none" mode="ios" routerLink="/tabs/queue">
+              <ion-icon name="pizza"></ion-icon>
+              <ion-label color="primary">Chef's Section</ion-label>
+            </ion-item> -->
+
+            <ng-container *ngIf="role === 'operator'">
+
+              <ion-item rippleEffect="true" detail="false" lines="none" mode="ios" routerLink="/con/session">
+  
+                <ion-icon name="copy-outline"></ion-icon>
+  
+                <ion-label color="primary">Session Status</ion-label>
+              </ion-item>
+            </ng-container>
+
+
+            <ion-item rippleEffect="true" detail="false" lines="none" mode="ios" routerLink="/con/setting">
+              <ion-icon name="cog-outline"></ion-icon>
+              <ion-label color="primary">Settings</ion-label>
+            </ion-item>
+
+            <ion-item rippleEffect="true" detail="false" lines="none" mode="ios" (click)="logout()">
+              <ion-icon name="power"></ion-icon>
+              <ion-label color="primary">Sign out</ion-label>
+            </ion-item>
+
+
+            
+
+          </ion-menu-toggle>
+        </ion-list>
+      </ion-content>
+
+
+
+
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+
+  </ion-split-pane>
+</ion-app>

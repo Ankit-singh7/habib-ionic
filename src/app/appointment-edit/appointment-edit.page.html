@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>create-appointment</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" *ngIf="detail">
+
+  <form id="infoForm" role="form" #infoForm="ngForm" style="background-color: #ddf0fb">
+
+    <ion-grid class="ion-padding">
+      <ion-row class="ion-padding">
+        <ion-col class="ion-no-padding ion-margin-bottom" size="12">
+          <ion-item lines="none" mode="md">
+            <ion-input mode="ios" placeholder="Customer Name" [(ngModel)]="detail.customer_name" #cus="ngModel" minlength="2" maxlength="50" pattern="^\S[a-zA-Z0-9\s]*$" name="en" required></ion-input>
+          </ion-item>
+        </ion-col>
+
+      <ion-col class="ion-no-padding ion-margin-bottom" size="12">
+        <ion-item mode="md" lines="none">
+          <ion-input mode="ios" type="text" placeholder="Purpose" [(ngModel)]="detail.purpose" name="etype"  required></ion-input>
+      </ion-item>
+    </ion-col>
+    <ion-col class="ion-no-padding ion-margin-bottom" size="12"> 
+      <ion-item mode="md" lines="none">
+        <ion-input mode="ios" type="text" placeholder="Appointment Date" [(ngModel)]= "selected_show_date" name="date" [readonly]="true" required></ion-input>
+        <ion-button class="city-btn" slot="end" (click)="showDate()"  mode="ios"><ion-icon name="caret-down-sharp"></ion-icon></ion-button>
+    </ion-item>
+  </ion-col>
+  <ion-col class="ion-no-padding ion-margin-bottom" size="12">
+    <ion-item mode="md" lines="none">
+      <ion-input mode="ios" type="text" placeholder="Expected Time" [(ngModel)]="detail.appointment_time" name="st" [readonly]="true" required></ion-input>
+      <ion-button class="city-btn" slot="end" (click)="showEventStartTime()"  [readonly]="true" mode="ios"><ion-icon name="caret-down-sharp"></ion-icon></ion-button>
+  </ion-item>
+</ion-col>
+<ion-col class="ion-no-padding ion-margin-bottom" size="12">
+  <ion-item mode="md" lines="none">
+    <ion-input mode="ios" type="text" placeholder="Payment Method" [(ngModel)]="detail.payment_mode" name="styy" [readonly]="true"></ion-input>
+    <ion-button class="city-btn" slot="end" (click)="showPayment()"  [readonly]="true" mode="ios"><ion-icon name="caret-down-sharp"></ion-icon></ion-button>
+</ion-item>
+</ion-col>
+<ion-col class="ion-no-padding ion-margin-bottom" size="12">
+  <ion-item mode="md" lines="none">
+    <ion-input mode="ios" inputmode="numeric" placeholder="Booking Amount (optional)" [(ngModel)]="detail.booking_amount" name="et"></ion-input>
+</ion-item>
+</ion-col>
+
+<ion-col size="12" class="ion-text-center ">
+      <p>{{message}}</p>
+
+          <ion-button mode="ios" class="sub ion-margin-vertical" expand="full" shape="round"  (click)="editAppointment()" [disabled]="!infoForm.valid">Submit</ion-button>
+        </ion-col>
+      </ion-row>
+   </ion-grid>
+  </form>
+
+</ion-content>

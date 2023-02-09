@@ -1,20 +1,53 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding-horizontal login-page" >
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <ion-row class="pad" justify-content-start align-items-center>
+   <ion-col size="12">
+      <ion-img alt="logo" class="logo" src="../../assets/images/icon.png"></ion-img>
+      <!-- <h1 class="ion-margin-bottom ion-text-center">Sign In</h1> -->
+      <form id="loginform" #loginForm="ngForm">
+      <ion-row class="form-group">
+          <ion-input  class="input" placeholder="Email" [(ngModel)]="email"  name="email" pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" class="form-control" required></ion-input>
+      </ion-row>
+      <br>
+      <ion-row class="form-group">
+      <ion-input [type]="inputType" [(ngModel)]="password" name="password" placeholder="Password" required></ion-input>        
+            <span class="icon" (click)="togglePassword()">
+              <ion-icon  size="large" mode="md" slot="end" [name]="showPassword?'eye':'eye-off'"></ion-icon>
+            </span>
+          </ion-row>
+            <ion-row>
+                <ion-col class="ion-no-padding" align-self-center>
+                    <ion-item lines="none" mode="md" class="ion-no-padding">
+                      <ion-checkbox mode="md" color="secondary" [(ngModel)]="rememberMe" name="rememberMe"></ion-checkbox>
+                      <ion-label>Remember Me</ion-label>
+                    </ion-item>
+                  </ion-col>
+                  <!-- <ion-col class="ion-no-padding">
+                    <ion-item lines="none" mode="md" class="ion-text-right" routerLink="/con/password-reset">
+                        <ion-note slot="end" mode="ios" class="pass">Forgot Password?</ion-note> 
+                    </ion-item>
+                  </ion-col> -->
+            </ion-row>
+            <ion-row class="ion-justify-content-center">
+              <ion-col size="12">
+                  <ng-container *ngIf="loginError">
+                     <ion-text class="block error" style="color:white"><ion-img src="../assets/images/error.png"></ion-img>{{message}}</ion-text>
+                  </ng-container>
+        
+              </ion-col>
+          
+          </ion-row>
+            <ion-fab-button mode="md"  size="small" (click)="login()" [disabled]="!loginForm.valid" color="light">
+                <ion-img src="../assets/images/log-arrow.png" class="" ></ion-img>
+              <!-- <ion-icon color="tertiary" mode="ios" size="large" name="arrow-round-forward"></ion-icon> -->
+            </ion-fab-button>
+          </form>
+           
+              <p class="custom-margin" href="" (click)="dontHaveAnAccount()" >Don't have an account?</p>
+   </ion-col>
+
+    </ion-row>
+
+  <p class="copy">© 2020-2021 HABIBB - All Rights Reserved</p>
 </ion-content>
