@@ -24,6 +24,8 @@ export class SessionPage extends RouterPage{
   public branchName: any;
   public executed = false;
   public createSession = false;
+  selectedPaymentModeName: any;
+  total: any;
 
   constructor(private platform: Platform,
     private invoiceService: InvoiceService,
@@ -33,8 +35,7 @@ export class SessionPage extends RouterPage{
     private router: Router,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute) {
-      super(router,route)
-     
+      super(router,route);    
   }
 
 
@@ -111,6 +112,7 @@ export class SessionPage extends RouterPage{
         loader.dismiss()
       },err => loader.dismiss())
     })
+    this.getAllBills()
   }
 }
 
@@ -217,6 +219,44 @@ export class SessionPage extends RouterPage{
       ]
     });
     await alert.present();
+  }
+
+
+
+  async getAllBills(){
+    if(this.role === 'operator') {
+
+      let loader = await this.loading.create({
+        message: 'Please wait...',
+      });
+  
+      loader.present().then(() => {
+        let data = {
+           
+          payment_mode: 'Cash',
+          branch_id: this.branchId,
+
+        }
+ 
+   
+          let filterStr = '';
+          for (let item in data) {
+             if(data[item]) {
+               filterStr = `${filterStr}${item}=${data[item]}&`
+             }
+             }
+        this.invoiceService.getAllBill(filterStr).subscribe((res) => {
+            if(res.data?.result) {               
+                this.total = 0;
+                this.total = +(res.data.total.split('-')[0]);              
+            } else {
+              this.total = 0;
+            }
+             loader.dismiss()
+        }, err => loader.dismiss())
+  
+      })
+    } 
   }
 
 

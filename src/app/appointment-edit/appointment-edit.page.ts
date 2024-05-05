@@ -113,7 +113,6 @@ export class AppointmentEditPage extends RouterPage {
       currentDate = moment(currentDate).add(1, 'days');
       i = i + 1;
     }
-    console.log(this.dateArray);
     return this.dateArray;
   }
 
@@ -216,13 +215,10 @@ export class AppointmentEditPage extends RouterPage {
       let col3 = await picker.getColumn('Slot');
 
       this.eventStartHourIndex = col1.options[col1.selectedIndex].value.split('-')[0];
-      console.log('hour', this.eventStartHourIndex)
       this.selectedStartHour = col1.options[col1.selectedIndex].text;
       this.eventStartMinuteIndex = col2.options[col2.selectedIndex].value.split('-')[0];
-      console.log('minute', this.eventStartMinuteIndex)
       this.selectedStartMin = col2.options[col2.selectedIndex].text;
       this.eventStartSlotIndex = col3.options[col3.selectedIndex].value.split('-')[0];
-      console.log('slot', this.eventStartSlotIndex)
       this.selectedStartSlot = col3.options[col3.selectedIndex].text;
       this.detail.appointment_time = `${this.selectedStartHour}:${this.selectedStartMin} ${this.selectedStartSlot}`;
       picker.columns.forEach(col => { col1.options.forEach(el => { delete el.selected; delete el.duration; delete el.transform; }) })

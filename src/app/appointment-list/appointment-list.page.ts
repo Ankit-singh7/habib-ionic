@@ -51,7 +51,6 @@ export class AppointmentListPage extends RouterPage{
       this.subjectService.getUserId().subscribe((res) => {
         this.userId = res
         this.subjectService.getRole().subscribe((res) => {
-          console.log(res)
           this.role  = res
           this.subjectService.getBranchId().subscribe((res) => {
             this.branchId = res
@@ -138,7 +137,6 @@ export class AppointmentListPage extends RouterPage{
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
-            console.log('Confirm Cancel: blah');
           }
         }, {
           text: 'Yes',

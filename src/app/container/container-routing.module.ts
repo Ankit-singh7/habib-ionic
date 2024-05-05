@@ -76,7 +76,17 @@ const routes: Routes = [
     {
       path: 'closing-balance',
       loadChildren: () => import('../closing-balance/closing-balance.module').then( m => m.ClosingBalancePageModule)
-    }
+    },
+    {
+      path: 'employee-wise-sales',
+      loadChildren: () => import('../employee-wise-sales/employee-wise-sales.module').then( m => m.EmployeeWiseSalesPageModule),
+      canActivate: [AuthService]
+    },
+    {
+      path: 'employee-sales-details',
+      loadChildren: () => import('../employee-sales-details/employee-sales-details.module').then( m => m.EmployeeSalesDetailsPageModule),
+      canActivate: [AuthService]
+    },
   ]
 
 }

@@ -46,7 +46,6 @@ export class ClosingBalancePage extends RouterPage{
       this.subjectService.getUserId().subscribe((res) => {
         this.userId = res
         this.subjectService.getRole().subscribe((res) => {
-          console.log(res)
           this.role  = res
           this.subjectService.getBranchId().subscribe((res) => {
             this.branchId = res
@@ -126,32 +125,6 @@ AddClosingBalance(){
     this.getCurrentStatus()
   },err=>console.log(err))
 }
-
-  // getActiveSession(){
-  //   let data = {
-           
-  //     branchId: this.branchId,
-  //     date: moment(new Date()).format('DD-MM-YYYY'),
-
-  //   }
-  //  let filterStr = '';
-  //     for (let item in data) {
-  //        if(data[item]) {
-  //          filterStr = `${filterStr}${item}=${data[item]}&`
-  //        }
-  //        }
-
-  //        this.invoiceService.getTodaySession(filterStr).subscribe((res) => {
-  //          if(res?.data?.result === null || res?.data?.result === []) {
-
-  //             this.presentPrompt();
-
-  //          } else {
-
-  //            this.getCurrentStatus();
-  //          }
-  //        })
-  // }
 
 
   async presentPrompt() {

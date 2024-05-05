@@ -96,9 +96,7 @@ export class BillingPage extends RouterPage {
       super(router,route)
 }
 
-ionViewDidDestroy(){
-  console.log('destroyed')
-}
+ionViewDidDestroy(){}
 
 
 
@@ -1255,8 +1253,35 @@ ionViewDidDestroy(){
       this.invoiceService.uploadPdf(form).subscribe((res) => {
         console.log('here')
          if(res) { 
-           this.socialSharing.shareViaWhatsAppToReceiver(`+91${this.phone}`,`HABIB SALON,
-           please click on the link below to view your bill and Save the number. Thank You Visit again`,`https://api.ahsalons.in/${res.path}`, `https://api.ahsalons.in/${res.path}`)
+           if(this.branchDetail.branch_id === 'Pr4sCmLyx' || this.branchDetail.branch_name === 'Hair Express Salon & Academy') {
+             this.socialSharing.shareViaWhatsAppToReceiver(
+               `+91${this.phone}`,
+               `Hair Express Salon & Academy,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/CQyJdm9pCn9zEAI/review`,
+             );
+           } else if (this.branchDetail.branch_id === 'fVj4BG0fF' || this.branchDetail.branch_name === 'Airport Habibb') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.phone}`,
+              `Airport Habibb,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/Cc7xvDTs5ndKEAI/review`,
+            );
+          } else if (this.branchDetail.branch_id === 'KOhOskJLG' || this.branchDetail.branch_name === 'Sodepur Habibb') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.phone}`,
+              `Sodepur Habibb,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/CYXEX55WmKCDEAI/review`,
+            );
+          } else if (this.branchDetail.branch_id === 'gW0vfq11U' || this.branchDetail.branch_name === 'A&h Salon & Academy') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.phone}`,
+              `A&h Salon & Academy,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/CciUQ3KvCbzOEAI/review`,
+            );
+          } else if (this.branchDetail.branch_id === 'F9KZrn7vt' || this.branchDetail.branch_name === 'Hair Express Belghoria Salon And Academy') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.phone}`,
+              `Hair Express Belghoria Salon And Academy,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/Cckxbz85-i8AEAI/review`,
+            );
+          } else {
+            this.socialSharing.shareViaWhatsAppToReceiver(`+91${this.phone}`,`HABIB SALON,
+            please click on the link below to view your bill and Save the number. Thank You Visit again`,`https://api.ahsalons.in/${res.path}`, `https://api.ahsalons.in/${res.path}`)
+          }
            this.phone = '';
            this.toggleCategory();
            loader.dismiss()

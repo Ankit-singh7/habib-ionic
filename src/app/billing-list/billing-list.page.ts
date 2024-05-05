@@ -79,7 +79,6 @@ export class BillingListPage extends RouterPage{
 
             }
             this.onDateChange()
-            console.log(this.startDate)
             }
         }, {
           text: 'Clear',
@@ -102,7 +101,6 @@ export class BillingListPage extends RouterPage{
               this.endDate = `${val.day.text}-${moment().month(val.month.text).format("MM")}-${val.year.text}`
             } 
             this.onDateChange()
-            console.log(this.endDate)
             }
         }, {
           text: 'Clear',
@@ -124,7 +122,6 @@ export class BillingListPage extends RouterPage{
     this.subjectService.getUserId().subscribe((res) => {
       this.userId = res
       this.subjectService.getRole().subscribe((res) => {
-        console.log(res)
         this.role  = res
         this.subjectService.getBranchId().subscribe((res) => {
           this.branchId = res
@@ -136,7 +133,7 @@ export class BillingListPage extends RouterPage{
 
                 this.getAllBills()
 
-              this.getCurrentStatus();
+                this.getCurrentStatus();
 
                 this.getPaymentList();
                 this.getAllEmployee()
@@ -154,7 +151,6 @@ export class BillingListPage extends RouterPage{
 }
 
 ionViewDidLeave(){
-  console.log('leave calls')
   this.payment = [];
   this.mode = [];
   this.selectedPaymentMode = '';
@@ -169,7 +165,6 @@ onDateChange() {
       let d1 = moment(this.startDate, 'DD-MM-YYYY').valueOf()
       let d2 = moment(this.endDate, 'DD-MM-YYYY').valueOf()
       if(d1<=d2) {
-        console.log('here')
         this.getAllBills()
       } else {
           this.dateComparePopup()
@@ -235,7 +230,6 @@ getBranchList(){
       }))
       let obj = {id:'',name:'All'}
       this.branchList = [obj,...tempArr]
-      console.log(this.branchList);
     } else {
       this.branchList = [];
     }
@@ -317,8 +311,6 @@ getBranchList(){
                     this.productTotal = this.productTotal + product.total
                   }
                 }
-                console.log(this.productTotal)
-                console.log(this.serviceTotal)
               }
             } else {
               this.total = 0;
@@ -355,7 +347,6 @@ getBranchList(){
             if(res.data?.result) {
 
               if(data.employee_id) {
-                console.log('inside employee')
                 this.billArray = res.data.result.filter((item) => item.total_price !== 0)
     
                 this.total = 0
@@ -385,7 +376,6 @@ getBranchList(){
                 }
 
               } else {
-                console.log('no employee')
                 
                             this.billArray = res.data.result.filter((item) => item.total_price !== 0)
                             this.total = 0
@@ -400,8 +390,6 @@ getBranchList(){
                                   this.productTotal = this.productTotal + product.total
                                 }
                             }
-                            console.log(this.productTotal)
-                            console.log(this.serviceTotal)
               }
             } else {
               this.total = 0;
@@ -498,7 +486,6 @@ getBranchList(){
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
-            console.log('Confirm Cancel: blah');
           }
         }, {
           text: 'Yes',
@@ -526,7 +513,6 @@ getBranchList(){
        this.getAllBills()
        loader.dismiss()
       },err => {
-        console.log(err)
         loader.dismiss()
       })
     })
@@ -560,8 +546,6 @@ getBranchList(){
     }) {
       this.selectedEmployee  =''
       this.selectedEmployee = event.value
-      console.log(this.selectedEmployee);
-      // this.getTotalSales()
       this.getAllBills()
     }
 

@@ -44,7 +44,6 @@ export class DashboardPage extends RouterPage {
         this.subjectService.getUserId().subscribe((res) => {
           this.userId = res
           this.subjectService.getRole().subscribe((res) => {
-            console.log(res)
             this.role  = res
             this.subjectService.getBranchId().subscribe((res) => {
               this.branchId = res

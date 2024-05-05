@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Employee Wise Sales</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>        
+        <ion-col size="6">
+          <ion-item lines="full">
+            <ionic-selectable placeholder="Payment Mode" [(ngModel)]="selectedPaymentMode" [items]="payment" itemValueField="id"
+              itemTextField="name" [canSearch]="true" (onChange)="paymentChange($event)" headerColor="danger">
+        
+              <ng-template ionicSelectableCloseButtonTemplate>
+                <ion-icon name="close-circle"></ion-icon>
+              </ng-template>
+        
+              <ng-template ionicSelectableTitleTemplate>
+                Payment Mode
+              </ng-template>
+        
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size="6">
+          <ion-item lines="full">
+            <ionic-selectable placeholder="Employee" [(ngModel)]="selectedEmployee" [items]="employeeList" itemValueField="user_id"
+              itemTextField="name" [canSearch]="true" (onChange)="employeeChange($event)" headerColor="danger">
+        
+              <ng-template ionicSelectableCloseButtonTemplate>
+                <ion-icon name="close-circle"></ion-icon>
+              </ng-template>
+        
+              <ng-template ionicSelectableTitleTemplate>
+                Select Employee
+              </ng-template>
+        
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+    </ion-row>
+  </ion-grid>
+
+     <ng-container *ngIf="billArray.length>0; else noidea">
+       
+        <ion-list *ngFor="let item of billArray | filter: 'customer_name,customer_phone' :search">
+      <ion-item lines="full">
+      <ion-label>
+
+        <h2 slot="start">{{item?.employee_name}}</h2>
+        <p><b>Total Sale: &#x20B9; {{item.total_price}}</b></p>
+        <p><b>Product Quantity Sold: {{item.product_quantity}}</b></p>
+        <p><b>Service Quantity Sold: {{item.service_quantity}}</b></p>
+          <ion-button mode="ios" size="small" color="tertiary" (click)="goToSales(item)">
+            <ion-icon slot="start" mode="md" name="eye"></ion-icon>
+            View
+          </ion-button>
+      </ion-label>
+    </ion-item>
+        </ion-list> 
+</ng-container>
+<ng-template #noidea>
+  <ion-item lines="none" class="mar" mode="ios" detail="false" rippleEffect="true">
+
+    <ion-label style="color: #2c3847;font-weight:'bold'" class="ion-text-center">No Sales For Today</ion-label>
+ 
+  </ion-item>
+  
+</ng-template>
+</ion-content>

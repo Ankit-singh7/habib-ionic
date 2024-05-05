@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Employee Sales Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="employeeSales">
+
+    <ion-row>
+      <ion-col>
+        <ion-item lines="full">
+          <ion-label>
+            <p>Employee Name: <b>{{employeeSales.employee_name}}</b></p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label>
+            <p>Total Sale: <b>&#x20B9; {{employeeSales.total_price}}</b></p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label>
+            <p>Product Quantity Sold: <b>{{employeeSales.product_quantity}}</b></p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label>
+            <p>Service Provided: <b>{{employeeSales.service_quantity}}</b></p>
+          </ion-label>
+        </ion-item>
+        <ion-card  *ngIf="employeeSales.services.length > 0">
+          <ion-card-content>
+            <ion-card-header>
+              <ion-card-subtitle>
+                <h1><B>Service Details</B></h1>
+              </ion-card-subtitle>
+            </ion-card-header>
+            <ion-row class="bod">
+              <ion-col size="12">
+                  <ng-container *ngFor="let service of employeeSales.services">
+                    <ion-item lines="full">
+                      <ion-label>
+                        <p class="wrap-text">Service: <b>{{service.name | titlecase}}</b></p>
+                        <p>Price: <b>&#x20B9; {{service.amount}}</b></p>
+                      </ion-label>
+                    </ion-item>
+                  </ng-container>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card *ngIf="employeeSales.products.length > 0">
+          <ion-card-content>
+            <ion-card-header>
+              <ion-card-subtitle>
+                <h1><B>Product Details</B></h1>
+              </ion-card-subtitle>
+            </ion-card-header>
+
+            <ion-row class="bod">
+              <ion-col size="12">
+                  <ng-container  *ngFor="let product of employeeSales.products">
+                    <ion-item lines="full">
+                      <ion-label>
+                        <p class="wrap-text">Product: <b>{{product.name | titlecase}}</b></p>
+                        <p>Price: <b>&#x20B9; {{product.amount}}</b></p>
+                      </ion-label>
+                    </ion-item>
+  
+                  </ng-container>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+
+</ion-content>

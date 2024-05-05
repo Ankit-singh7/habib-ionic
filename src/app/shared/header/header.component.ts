@@ -19,6 +19,12 @@ export class HeaderComponent implements OnInit {
       if (event instanceof NavigationEnd) {
         this.title = '';
         this.activatedRoute = window.location.pathname;
+        if(this.activatedRoute.includes(';')) {
+          this.activatedRoute = this.activatedRoute.split(';')[0]
+          if(this.activatedRoute === '/con/employee-sales-details') {
+            this.title = 'Sales Details'
+          }
+        }
         if (this.activatedRoute === '/con/dashboard') {
           this.title = 'My Dashboard'
         }
@@ -75,6 +81,9 @@ export class HeaderComponent implements OnInit {
         }
         if(this.activatedRoute === '/con/product-sales') {
           this.title = 'Product Sales Report'
+        }
+        if(this.activatedRoute === '/con/employee-wise-sales') {
+          this.title = 'Employee Wise Sales'
         }
       }
 
