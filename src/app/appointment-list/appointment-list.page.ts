@@ -1,14 +1,12 @@
-import { getLocaleDirection } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PickerController, LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController, AlertController } from '@ionic/angular';
 import { RouterPage } from '../dashboard/router.page';
 import { AppointmentService } from '../services/appointment/appointment.service';
-import { DataArrayService } from '../services/data-array/data-array.service';
 import { InvoiceService } from '../services/invoice/invoice.service';
-import { ModeService } from '../services/mode/mode.service';
 import * as moment from 'moment';
 import { SubjectService } from '../services/subject/subject.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-appointment-list',
@@ -30,14 +28,13 @@ export class AppointmentListPage extends RouterPage{
   public executed = false;
 
 
-  constructor(private picker: PickerController,
-    private arrayService: DataArrayService,
+  constructor(
     private subjectService: SubjectService,
     private loading: LoadingController,
     private alertController: AlertController,
-    private appointmentService: AppointmentService,
-    private modeService: ModeService,  
-    private invoiceService: InvoiceService,      
+    private appointmentService: AppointmentService, 
+    private invoiceService: InvoiceService, 
+    private toastController: ToastController,     
     private router: Router,
     private route: ActivatedRoute) { 
         super(router,route) 
@@ -60,7 +57,7 @@ export class AppointmentListPage extends RouterPage{
                 
                 if(this.userName !== null && this.userId !== null && this.role !== null && this.branchId !== null  && this.branchName !== null) {
                   this.getAppointmentList()
-                   this.getCurrentStatus();
+                  this.getCurrentStatus();
 
                   this.executed = true;
                 }  
@@ -103,6 +100,7 @@ export class AppointmentListPage extends RouterPage{
             if(res.data?.result) {
   
               this.appointmentList = res.data.result
+              console.log(this.appointmentList);
             } else {
               this.appointmentList = [];
             }
@@ -257,5 +255,14 @@ async presentPrompt() {
   await alert.present();
 }
 
+async showSuccessCopyToaster(id) {
+  const toast = await this.toastController.create({
+    message: `Copied ${id} successfully!`,
+    duration: 2000,
+    position: 'bottom',
+    color: 'success'
+  });
+  toast.present();
+}
 
 }

@@ -349,7 +349,7 @@
       <ion-col  style="color: #2c3847;">
         <ion-item>
           <ion-label>Dual Payment</ion-label>
-          <ion-toggle [(ngModel)]="dual_payment" (ionChange)="onDualChange()"></ion-toggle>
+          <ion-toggle [(ngModel)]="dual_payment"></ion-toggle>
         </ion-item>
       </ion-col>
   </ion-row>
@@ -361,12 +361,6 @@
         <ion-label mode="ios" position="stacked" style="color: #2c3847;"> Name</ion-label>
         <ion-input type="text" placeholder="" [(ngModel)]="name" name="customer"></ion-input>
       </ion-item>
-
-
-      <!-- <ion-item mode="ios" lines="full" >
-          <ion-label mode="ios"  position="stacked" style="color: #2c3847;">Email Address (optional)</ion-label>
-          <ion-input type="email" placeholder="" ></ion-input>
-      </ion-item> -->
 
       <ion-item mode="ios" lines="full">
         <ion-label mode="ios" position="stacked" style="color: #2c3847;">Whatsapp Number</ion-label>
@@ -385,23 +379,15 @@
         <ion-input type="text" placeholder="" [(ngModel)]="address" name="address"></ion-input>
       </ion-item>
 
-
-      <!-- <ion-item mode="ios" lines="full">
-        <ion-label mode="ios" position="stacked" style="color: #2c3847;">Select Employee</ion-label>
-        <ionic-selectable [(ngModel)]="selectedEmployee" [items]="employeeList" itemValueField="user_id"
-          itemTextField="name" [canSearch]="true" (onChange)="employeeChange($event)" headerColor="danger">
-
-          <ng-template ionicSelectableCloseButtonTemplate>
-            <ion-icon name="close-circle"></ion-icon>
-          </ng-template>
-
-          <ng-template ionicSelectableTitleTemplate>
-            Select Employee
-          </ng-template>
-
-        </ionic-selectable>
-      </ion-item> -->
-
+      <ion-item mode="ios" lines="full">
+        <ion-label mode="ios" position="stacked" style="color: #2c3847;"> Appointment ID (optional)</ion-label>
+        <div class="input-container">
+          <ion-input class="id-input" [(ngModel)]="appointmentId" placeholder="Paste Appointment ID"></ion-input>
+          <ion-button class="paste-button" fill="clear" (click)="pasteTextFromClipboard()">
+            <ion-icon slot="icon-only" name="clipboard-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
 
       <ng-container *ngIf="!dual_payment">
 
@@ -460,20 +446,9 @@
               </ng-template>
           
             </ionic-selectable>
-          </ion-item>
-      
+          </ion-item>      
       </ng-container>
         
-
-      <!-- <ng-container *ngIf="netBanking">
-    <ion-item mode="ios" lines="full" >
-      <ion-label mode="ios"  position="stacked"style="color: #2c3847;" >Payment Option</ion-label>
-      <ion-input type="text" placeholder=""  readonly>Net Banking</ion-input>
-  </ion-item>
-  </ng-container> -->
-
-
-
 
 
     </ion-list>

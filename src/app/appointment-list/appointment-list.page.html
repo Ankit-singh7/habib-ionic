@@ -7,38 +7,6 @@
 <ion-content>
   <ion-grid>
     <ion-row>
-      <!-- <ion-col size="6">
-        <ion-item lines="full">
-          <ionic-selectable placeholder="Payment Mode" [(ngModel)]="selectedPaymentMode" [items]="payment" itemValueField="id"
-            itemTextField="name" [canSearch]="true" (onChange)="paymentChange($event)" headerColor="danger">
-      
-            <ng-template ionicSelectableCloseButtonTemplate>
-              <ion-icon name="close-circle"></ion-icon>
-            </ng-template>
-      
-            <ng-template ionicSelectableTitleTemplate>
-              Payment Mode
-            </ng-template>
-      
-          </ionic-selectable>
-        </ion-item>
-      </ion-col>
-      <ion-col size="6">
-        <ion-item lines="full">
-          <ionic-selectable placeholder="Employee" [(ngModel)]="selectedEmployee" [items]="employeeList" itemValueField="user_id"
-            itemTextField="name" [canSearch]="true" (onChange)="employeeChange($event)" headerColor="danger">
-      
-            <ng-template ionicSelectableCloseButtonTemplate>
-              <ion-icon name="close-circle"></ion-icon>
-            </ng-template>
-      
-            <ng-template ionicSelectableTitleTemplate>
-              Select Employee
-            </ng-template>
-      
-          </ionic-selectable>
-        </ion-item>
-      </ion-col> -->
       <ion-col size="12">
         <ion-searchbar placeholder="Search by Customer" [(ngModel)]="search" name="search" (ionChange)="searchedText()" mode="md"></ion-searchbar>
       </ion-col>
@@ -54,12 +22,17 @@
         <h2 slot="start">{{item?.customer_name?item?.customer_name:'Not Mentioned'}}</h2>
         <p><b>Booking Amount: &#x20B9; {{item.booking_amount}}</b></p>
         <p><b>Appointment Date: {{item.appointment_date}}</b></p>
+        <p><b>Appointment Id : {{item.appointment_id}}</b></p>
         <a href="tel:{{item.phone?item.phone:'2323443223'}}">
-          <ion-button mode="ios" size="small" color="tertiary" routerLink="/con/appointment-edit"  [queryParams]="{id:item.appointment_id}">
+          <ion-button mode="ios" size="small" color="primary" routerLink="/con/appointment-edit"  [queryParams]="{id:item.appointment_id}">
             <ion-icon slot="start" mode="md" name="create"></ion-icon>
             Edit
           </ion-button>
         </a>
+        <ion-button mode="ios" size="small" color="secondary" [cdkCopyToClipboard]="item.appointment_id" (click)="showSuccessCopyToaster(item.appointment_id)">
+          <ion-icon slot="start" mode="md" name="copy-outline"></ion-icon>
+          copy ID
+        </ion-button>
         <ion-button mode="ios" size="small" color="danger" (click)="deleteAppointment(item.appointment_id)">
           <ion-icon slot="start" mode="md" name="trash"></ion-icon>
           Delete

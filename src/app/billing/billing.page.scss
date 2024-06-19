@@ -87,3 +87,21 @@ button:focus {
 .custom-total{
   margin-top: 0px;
 }
+
+
+
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.id-input {
+  flex: 1;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+.paste-button{
+  margin-left: 8px;
+}

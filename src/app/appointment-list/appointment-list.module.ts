@@ -8,13 +8,14 @@ import { AppointmentListPageRoutingModule } from './appointment-list-routing.mod
 
 import { AppointmentListPage } from './appointment-list.page';
 import { FilterPipe } from '../shared/pipe/filter.pipe';
-
+import { ClipboardModule } from '@angular/cdk/clipboard';
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    AppointmentListPageRoutingModule
+    AppointmentListPageRoutingModule,
+    ClipboardModule
   ],
   declarations: [AppointmentListPage,FilterPipe]
 })

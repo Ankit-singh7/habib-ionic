@@ -15,7 +15,11 @@
             <ion-input mode="ios" placeholder="Customer Name" [(ngModel)]="customer_name" #cus="ngModel" minlength="2" maxlength="50" pattern="^\S[a-zA-Z0-9\s]*$" name="en" required></ion-input>
           </ion-item>
         </ion-col>
-
+        <ion-col class="ion-no-padding ion-margin-bottom" size="12">
+          <ion-item lines="none" mode="md">
+            <ion-input mode="ios" placeholder="Customer Whatsapp Number" [(ngModel)]="customer_whatsapp_number" #cus="ngModel" minlength="2" maxlength="50" type="text" inputmode="numeric" name="en"></ion-input>
+          </ion-item>
+        </ion-col>
       <ion-col class="ion-no-padding ion-margin-bottom" size="12">
         <ion-item mode="md" lines="none">
           <ion-input mode="ios" type="text" placeholder="Purpose" [(ngModel)]="purpose" name="etype"  required></ion-input>

@@ -8,6 +8,7 @@ import { SubjectService } from '../services/subject/subject.service';
 import { AppointmentService } from '../services/appointment/appointment.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterPage } from '../dashboard/router.page';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 
 @Component({
   selector: 'app-create-appointment',
@@ -17,6 +18,7 @@ import { RouterPage } from '../dashboard/router.page';
 export class CreateAppointmentPage extends RouterPage {
 
   public customer_name;
+  public customer_whatsapp_number;
   public purpose;
   public selected_date;
   public selected_show_date;
@@ -48,6 +50,7 @@ export class CreateAppointmentPage extends RouterPage {
               private modeService: ModeService, 
               private alertController: AlertController,   
               private router: Router,
+              private socialSharing: SocialSharing,
               private route: ActivatedRoute) { 
                   super(router,route)
                 this.subjectService.getBranchId().subscribe((res) => {
@@ -82,7 +85,6 @@ export class CreateAppointmentPage extends RouterPage {
       currentDate = moment(currentDate).add(1, 'days');
       i = i + 1;
     }
-    console.log(this.dateArray);
     return this.dateArray;
   }
 
@@ -185,13 +187,10 @@ export class CreateAppointmentPage extends RouterPage {
       let col3 = await picker.getColumn('Slot');
 
       this.eventStartHourIndex = col1.options[col1.selectedIndex].value.split('-')[0];
-      console.log('hour', this.eventStartHourIndex)
       this.selectedStartHour = col1.options[col1.selectedIndex].text;
       this.eventStartMinuteIndex = col2.options[col2.selectedIndex].value.split('-')[0];
-      console.log('minute', this.eventStartMinuteIndex)
       this.selectedStartMin = col2.options[col2.selectedIndex].text;
       this.eventStartSlotIndex = col3.options[col3.selectedIndex].value.split('-')[0];
-      console.log('slot', this.eventStartSlotIndex)
       this.selectedStartSlot = col3.options[col3.selectedIndex].text;
       this.startTime = `${this.selectedStartHour}:${this.selectedStartMin} ${this.selectedStartSlot}`;
       picker.columns.forEach(col => { col1.options.forEach(el => { delete el.selected; delete el.duration; delete el.transform; }) })
@@ -263,14 +262,51 @@ export class CreateAppointmentPage extends RouterPage {
           booking_amount: this.amount?this.amount:0
          }
   
-         this.appointmentService.createAppointment(data).subscribe((res) => {
-             this.router.navigate(['/con/appointment-list'])
-          
-            loader.dismiss()
-         },err => loader.dismiss())
+        this.appointmentService.createAppointment(data).subscribe((res) => {
+          if (this.branchId === 'Pr4sCmLyx' || this.branchName === 'Hair Express Salon & Academy') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.customer_whatsapp_number}`,
+              this.generateMessage('Hair Express Salon & Academy')
+            );
+          } else if (this.branchId === 'fVj4BG0fF' || this.branchName === 'Airport Habibb') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.customer_whatsapp_number}`,
+              this.generateMessage('Airport Habibb')
+            );
+          } else if (this.branchId === 'KOhOskJLG' || this.branchName === 'Sodepur Habibb') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.customer_whatsapp_number}`,
+              this.generateMessage('Sodepur Habibb')
+            );
+          } else if (this.branchId === 'gW0vfq11U' || this.branchName === 'A&h Salon & Academy') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.customer_whatsapp_number}`,
+              this.generateMessage('A&h Salon & Academy')
+            );
+          } else if (this.branchId === 'F9KZrn7vt' || this.branchName === 'Hair Express Belghoria Salon And Academy') {
+            this.socialSharing.shareViaWhatsAppToReceiver(
+              `+91${this.customer_whatsapp_number}`,
+              this.generateMessage('Hair Express Belghoria Salon And Academy')
+            );
+          } else {
+            this.socialSharing.shareViaWhatsAppToReceiver(`+91${this.customer_whatsapp_number}`,
+              this.generateMessage('HABIB SALON')
+            );
+          }
+          this.router.navigate(['/con/appointment-list'])
+          loader.dismiss()
+        }, err => loader.dismiss())
       })
     }
 
+  }
+
+  generateMessage(salon_name) {
+     if(this.amount && this.amount !== 0) {
+       return  `${salon_name} \nDear ${this.customer_name}, \nYour appointment has been successfully booked for ${this.selected_date} at ${this.startTime}. An advance payment of Rs ${this.amount} has been received. \nThank you for choosing our salon. We look forward to serving you!`
+     } else {
+      return  `${salon_name} \nDear ${this.customer_name}, \nYour appointment has been successfully booked for ${this.selected_date} at ${this.startTime}.\nThank you for choosing our salon. We look forward to serving you!`
+     }
   }
 
 
