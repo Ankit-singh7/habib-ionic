@@ -23,7 +23,7 @@ export class SubjectService extends RouterPage {
   public branchId =  new BehaviorSubject(null);
   public branchName =  new BehaviorSubject(null);
   public role =  new BehaviorSubject(null);
-
+  public subjects = {};
 
 
   constructor( private platform: Platform,
@@ -40,65 +40,28 @@ super(router,route)
   initializeApp(){
     this.platform.ready().then(() => {
 
-      this.fullName.next(localStorage.getItem('fullName'))
+    this.fullName.next(localStorage.getItem('fullName'))
 
-    //  this.storage.get('fullName').then((res) => {
-    //    this.fullName.next(res)
-    //  })
-
-
-     this.authToken.next(localStorage.getItem('token'))
-    //  this.storage.get('token').then((res) => {
-    //    this.authToken.next(res)
-    //  })
+    this.authToken.next(localStorage.getItem('token'))
 
     this.userType.next(localStorage.getItem('userType'));
-    //  this.storage.get('userType').then((res) => {
-    //    this.userType.next(res);
-    //  })
 
     this.isLoggedIn.next(localStorage.getItem('isLoggedIn'));
-    //  this.storage.get('isLoggedIn').then((res) => {
-    //    this.isLoggedIn.next(res);
-    //  })
 
     this.userId.next(localStorage.getItem('userId'));
-    //  this.storage.get('userId').then((res) => {
-    //    this.userId.next(res);
-    //  })
 
     this.sessionId.next(localStorage.getItem('sessionId'))
-    //  this.storage.get('sessionId').then((res) => {
-    //    this.sessionId.next(res)
-    //  })
 
     this.sessionBalance.next(localStorage.getItem('sessionBalance'))
-    //  this.storage.get('sessionBalance').then((res) => {
-    //    this.sessionBalance.next(res)
-    //  })
 
 
     this.canWithdraw.next(localStorage.getItem('canWithdraw'))
-    //  this.storage.get('canWithdraw').then((res) => {
-    //   this.canWithdraw.next(res)
-    // })
-
-
 
     this.branchId.next(localStorage.getItem('branchId'))
-    // this.storage.get('branchId').then((res) => {
-    //   this.branchId.next(res)
-    // })
 
     this.branchName.next(localStorage.getItem('branchName'))
-    // this.storage.get('branchName').then((res) => {
-    //   this.branchName.next(res)
-    // })
 
     this.role.next(localStorage.getItem('role'))
-    // this.storage.get('role').then((res) => {
-    //   this.role.next(res)
-    // })
 
     })
   }
@@ -128,7 +91,6 @@ super(router,route)
 
 
   setRole(val) {
-    // localStorage.setItem('userType', val);
     localStorage.setItem('role', val)
     this.role.next(val);
   }
@@ -143,7 +105,6 @@ super(router,route)
 
 
   setUserType(val) {
-    // localStorage.setItem('userType', val);
     localStorage.setItem('userType', val)
     this.userType.next(val);
   }
@@ -164,7 +125,6 @@ super(router,route)
   }
 
   setFullName(val){
-    // localStorage.setItem('fullName', val);
     localStorage.setItem('fullName', val)
     this.fullName.next(val);
   }
@@ -190,7 +150,6 @@ super(router,route)
   }
 
   setUserId(val){
-    // localStorage.setItem('userId', val);
     localStorage.setItem('userId', val)
     this.userId.next(val)
   }
@@ -221,6 +180,30 @@ super(router,route)
   setCanWithdraw(val){
     localStorage.setItem('canWithdraw', val)
     this.canWithdraw.next(val)
+  }
+
+  setLocalStorage(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+
+  getLocalStorage(key) {
+    const storedValue = localStorage.getItem(key);
+    return storedValue ? JSON.parse(storedValue) : null;
+  }
+  
+
+  resetAllSubjects(){
+    this.fullName.next(null);
+    this.authToken.next(null);
+    this.userType.next(null);
+    this.isLoggedIn.next(null);
+    this.userId.next(null);
+    this.sessionId.next(null);
+    this.sessionBalance.next(null);
+    this.canWithdraw.next(null);
+    this.branchId.next(null);
+    this.branchName.next(null);
+    this.role.next(null);
   }
 
 }

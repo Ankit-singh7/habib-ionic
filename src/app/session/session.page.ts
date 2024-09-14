@@ -138,33 +138,6 @@ export class SessionPage extends RouterPage{
 
   }
 
-  // getActiveSession(){
-  //   let data = {
-           
-  //     branchId: this.branchId,
-  //     date: moment(new Date()).format('DD-MM-YYYY'),
-
-  //   }
-  //  let filterStr = '';
-  //     for (let item in data) {
-  //        if(data[item]) {
-  //          filterStr = `${filterStr}${item}=${data[item]}&`
-  //        }
-  //        }
-
-  //        this.invoiceService.getTodaySession(filterStr).subscribe((res) => {
-  //          if(res?.data?.result === null || res?.data?.result === []) {
-
-  //             this.presentPrompt();
-
-  //          } else {
-
-  //            this.getCurrentStatus();
-  //          }
-  //        })
-  // }
-
-
   async presentPrompt() {
     let alert =await this.alertController.create({
       header: 'Start your Session',

@@ -52,12 +52,9 @@ export class AppComponent {
       message: 'Please wait...',
     });
     loader.present().then(() => {
-      localStorage.setItem('isLoggedIn', 'false');
-      this.subjectService.setLoginStatus('false');
       this.router.navigate(['/home'])
-      this.subjectService.setRole(null)
-      this.subjectService.setUserId(null)
-      this.subjectService.setBranchId(null)
+      this.subjectService.resetAllSubjects();
+      localStorage.clear();
       loader.dismiss();
     })
   }

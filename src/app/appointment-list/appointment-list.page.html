@@ -22,21 +22,31 @@
         <h2 slot="start">{{item?.customer_name?item?.customer_name:'Not Mentioned'}}</h2>
         <p><b>Booking Amount: &#x20B9; {{item.booking_amount}}</b></p>
         <p><b>Appointment Date: {{item.appointment_date}}</b></p>
-        <p><b>Appointment Id : {{item.appointment_id}}</b></p>
-        <a href="tel:{{item.phone?item.phone:'2323443223'}}">
+        <p><b>Appointment Id: {{item.appointment_id}}</b></p>
+        <p><b>Phone no: {{item.phone_number}}</b></p>
+        <ng-container *ngIf="item.employee_name">
+          <p><b>Employee Name: {{item.employee_name}}</b></p>
+        </ng-container>
           <ion-button mode="ios" size="small" color="primary" routerLink="/con/appointment-edit"  [queryParams]="{id:item.appointment_id}">
             <ion-icon slot="start" mode="md" name="create"></ion-icon>
             Edit
           </ion-button>
-        </a>
         <ion-button mode="ios" size="small" color="secondary" [cdkCopyToClipboard]="item.appointment_id" (click)="showSuccessCopyToaster(item.appointment_id)">
           <ion-icon slot="start" mode="md" name="copy-outline"></ion-icon>
-          copy ID
+          Copy ID
         </ion-button>
-        <ion-button mode="ios" size="small" color="danger" (click)="deleteAppointment(item.appointment_id)">
-          <ion-icon slot="start" mode="md" name="trash"></ion-icon>
-          Delete
-        </ion-button>
+        <ng-container *ngIf="item.phone_number">
+          <ion-button mode="ios" size="small" color="tertiary" (click)="callPhoneNumber(item.phone_number)">
+            <ion-icon slot="start" mode="md" name="call-outline"></ion-icon>
+            Call
+          </ion-button>
+        </ng-container>
+        <ng-container *ngIf="role==='admin'">
+          <ion-button mode="ios" size="small" color="danger" (click)="deleteAppointment(item.appointment_id)">
+            <ion-icon slot="start" mode="md" name="trash"></ion-icon>
+            Delete
+          </ion-button>
+        </ng-container>
       </ion-label>
 
     </ion-item>

@@ -97,7 +97,9 @@ export class BillingPage extends RouterPage {
     super(router, route)
   }
 
-  ionViewDidDestroy() { }
+  ionViewDidDestroy() {
+    this.booking_amount = 0;
+   }
 
 
 
@@ -120,15 +122,9 @@ export class BillingPage extends RouterPage {
               if (!this.executed) {
 
                 if (this.userName !== null && this.userId !== null && this.role !== null && this.branchId !== null && this.branchName !== null) {
-
-                  this.getCurrentStatus();
-                  this.getPaymentList();
-                  this.getServiceCategory();
-                  this.getBrand();
+                  this.hardRefresh();
                   this.getMostlyUsedProductList();
                   this.getMostlyUsedServiceList();
-                  this.getAllEmployee();
-                  this.getBranchDetail(this.branchId)
                   this.executed = true;
                 }
               }
@@ -138,6 +134,51 @@ export class BillingPage extends RouterPage {
         })
       })
     })
+  }
+
+  async hardRefresh(event = null, hardRefresh = false) {
+    let isDataMissing = false;
+  
+    if (!hardRefresh) {
+      const paymentList = await this.subjectService.getLocalStorage('paymentListBilling');
+      const employeeList = await this.subjectService.getLocalStorage('employeeList');
+      const brandList = await this.subjectService.getLocalStorage('brandList');
+      const serviceCategoryList = await this.subjectService.getLocalStorage('serviceCategoryList');
+      const branchDetail = await this.subjectService.getLocalStorage('branchDetail');
+      // Check if any data is missing
+      if (paymentList === null || employeeList === null || brandList === null || serviceCategoryList === null || branchDetail === null) {
+        isDataMissing = true;
+      } else {
+        // If all data is found, use it
+        this.payment = paymentList;
+        this.employeeList = employeeList;
+        this.brandList = brandList
+        this.serviceCategoryList = serviceCategoryList
+        this.branchDetail = branchDetail
+  
+        // Complete the refresher if it was triggered
+        if (event) {
+          event.target.complete();
+        }
+  
+        // Return early since we have all the cached data
+        return;
+      }
+    }
+  
+    // If hardRefresh is true, or data is missing, call the API to refresh
+    if (hardRefresh || isDataMissing) {
+      await this.getPaymentList();
+      await this.getBrand();
+      await this.getAllEmployee();
+      await this.getServiceCategory();
+      await this.getBranchDetail(this.branchId);
+    }
+  
+    // Complete the refresher if it was triggered
+    if (event) {
+      event.target.complete();
+    }
   }
 
 
@@ -171,6 +212,7 @@ export class BillingPage extends RouterPage {
     this.invoiceService.getBranchDetail(id).subscribe((res) => {
       if (res.data) {
         this.branchDetail = res.data
+        this.subjectService.setLocalStorage('branchDetail', this.branchDetail)
       }
     })
   }
@@ -183,6 +225,7 @@ export class BillingPage extends RouterPage {
         id: item.payment_mode_id,
         name: item.payment_mode_name
       }))
+    this.subjectService.setLocalStorage('paymentListBilling', this.payment);
     })
   }
 
@@ -396,7 +439,7 @@ export class BillingPage extends RouterPage {
     loader.present().then(() => {
       this.invoiceService.getAllBill().subscribe((res) => {
         if (res.data?.result) {
-          if (res.data.result.length > 0) {
+          if (res.data?.result.length > 0) {
             let tempCount = res.data?.result.length + 1;
             if (tempCount <= 99) {
 
@@ -409,8 +452,10 @@ export class BillingPage extends RouterPage {
           }
           this.showGenerateBill(billId);
         } else {
-          this.message = 'Something Went Wrong. Please Retry.'
-          this.formError = true;
+          this.billCount = '01';
+          this.showGenerateBill(billId);
+          // this.message = 'Something Went Wrong. Please Retry.'
+          // this.formError = true;
         }
 
         loader.dismiss()
@@ -441,6 +486,7 @@ export class BillingPage extends RouterPage {
       this.menuService.getAllServiceCatergory().subscribe((res) => {
         this.serviceCategoryList = res.data;
         loader.dismiss();
+        this.subjectService.setLocalStorage('serviceCategoryList', this.serviceCategoryList);
       }, err => loader.dismiss())
     })
 
@@ -455,6 +501,7 @@ export class BillingPage extends RouterPage {
     loader.present().then(() => {
       this.menuService.getAllBrand().subscribe((res) => {
         this.brandList = res.data;
+        this.subjectService.setLocalStorage('brandList', this.brandList);
         loader.dismiss();
       }, err => loader.dismiss())
     })
@@ -637,7 +684,7 @@ export class BillingPage extends RouterPage {
               } else {
                 continue;
               }
-            }
+            }            
           } else {
             continue;
           }
@@ -665,6 +712,7 @@ export class BillingPage extends RouterPage {
           ...item
 
         }))
+        this.subjectService.setLocalStorage('employeeList', this.employeeList);
       } else {
         this.employeeList = [];
       }
@@ -1169,6 +1217,7 @@ export class BillingPage extends RouterPage {
           this.productList = [];
           this.salonSelectedItems = [];
           this.appointmentId = '';
+          this.booking_amount = 0;
           loader.dismiss()
         } else {
           this.phone = '';
@@ -1190,6 +1239,7 @@ export class BillingPage extends RouterPage {
           this.productList = [];
           this.salonSelectedItems = [];
           this.appointmentId = '';
+          this.booking_amount = 0;
           loader.dismiss()
         }
 

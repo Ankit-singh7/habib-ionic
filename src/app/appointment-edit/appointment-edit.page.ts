@@ -9,6 +9,8 @@ import { RouterPage } from '../dashboard/router.page';
 import { ModeService } from '../services/mode/mode.service';
 import { DataArrayService } from '../services/data-array/data-array.service';
 import { getLocaleDateFormat } from '@angular/common';
+import { SubjectService } from '../services/subject/subject.service';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 
 @Component({
   selector: 'app-appointment-edit',
@@ -25,7 +27,10 @@ export class AppointmentEditPage extends RouterPage {
     booking_amount: 0,
     customer_name: '',
     payment_mode: '',
-    purpose: ''
+    purpose: '',
+    phone_number: '',
+    employee_id: '',
+    employee_name: ''
   }
   public selected_date;
   public selected_show_date;
@@ -47,6 +52,11 @@ export class AppointmentEditPage extends RouterPage {
   selectedStartMin: string;
   selectedStartSlot: string;
   startTime: string;
+  branchId: any;
+  branchName: any;
+  userId: any;
+  fullName: any;
+
 
   constructor(
     private picker: PickerController,
@@ -56,11 +66,28 @@ export class AppointmentEditPage extends RouterPage {
     private router: Router,
     private arrayService: DataArrayService,
     private modeService: ModeService,
+    private subjectService: SubjectService,
+    private socialSharing: SocialSharing,
     private route: ActivatedRoute) { 
       super(router,route)
       this.route.queryParams.subscribe(params => {
            this.appointmentId = params['id'];
            this.getAppointmentDetails(this.appointmentId)
+           
+      })
+
+      this.subjectService.getBranchId().subscribe((res) => {
+        this.branchId = res
+      })
+
+      this.subjectService.getBranchName().subscribe((res) => {
+        this.branchName = res
+      })
+      this.subjectService.getUserId().subscribe((res) => {
+        this.userId = res
+      })
+      this.subjectService.getFullName().subscribe((res) => {
+        this.fullName = res
       })
 
     }
@@ -95,6 +122,9 @@ export class AppointmentEditPage extends RouterPage {
           this.detail.booking_amount = res.data.booking_amount?res.data.booking_amount:0
           this.detail.purpose = res.data.purpose
           this.detail.payment_mode = res.data.payment_mode
+          this.detail.phone_number = res.data.phone_number
+          this.detail.employee_id = res?.data?.employee_id ? res.data.employee_id :  this.userId
+          this.detail.employee_name = res?.data?.employee_name ? res.data.employee_name : this.fullName
         }
         loader.dismiss()
       },err => loader.dismiss())
@@ -274,6 +304,36 @@ export class AppointmentEditPage extends RouterPage {
 
     loader.present().then(() => {
       this.appointmentService.editAppointment(this.detail,this.detail.appointment_id).subscribe((res) => {
+        if (this.branchId === 'Pr4sCmLyx' || this.branchName === 'Hair Express Salon & Academy') {
+          this.socialSharing.shareViaWhatsAppToReceiver(
+            `+91${this.detail.phone_number}`,
+            this.generateMessage('Hair Express Salon & Academy')
+          );
+        } else if (this.branchId === 'fVj4BG0fF' || this.branchName === 'Airport Habibb') {
+          this.socialSharing.shareViaWhatsAppToReceiver(
+            `+91${this.detail.phone_number}`,
+            this.generateMessage('Airport Habibb')
+          );
+        } else if (this.branchId === 'KOhOskJLG' || this.branchName === 'Sodepur Habibb') {
+          this.socialSharing.shareViaWhatsAppToReceiver(
+            `+91${this.detail.phone_number}`,
+            this.generateMessage('Sodepur Habibb')
+          );
+        } else if (this.branchId === 'gW0vfq11U' || this.branchName === 'A&h Salon & Academy') {
+          this.socialSharing.shareViaWhatsAppToReceiver(
+            `+91${this.detail.phone_number}`,
+            this.generateMessage('A&h Salon & Academy')
+          );
+        } else if (this.branchId === 'F9KZrn7vt' || this.branchName === 'Hair Express Belghoria Salon And Academy') {
+          this.socialSharing.shareViaWhatsAppToReceiver(
+            `+91${this.detail.phone_number}`,
+            this.generateMessage('Hair Express Belghoria Salon And Academy')
+          );
+        } else {
+          this.socialSharing.shareViaWhatsAppToReceiver(`+91${this.detail.phone_number}`,
+            this.generateMessage('HABIB SALON')
+          );
+        }
         this.router.navigate(['/con/appointment-list'])
         loader.dismiss()
     },err => loader.dismiss())
@@ -282,5 +342,13 @@ export class AppointmentEditPage extends RouterPage {
     })
 
   }
+
+  generateMessage(salon_name) {
+    if(this.amount && this.amount !== 0) {
+      return  `${salon_name} \nDear ${this.detail.customer_name}, \nYour appointment has been successfully booked for ${this.selected_date} at ${this.startTime}. An advance payment of Rs ${this.amount} has been received. \nThank you for choosing our salon. We look forward to serving you!`
+    } else {
+     return  `${salon_name} \nDear ${this.detail.customer_name}, \nYour appointment has been successfully booked for ${this.selected_date} at ${this.startTime}.\nThank you for choosing our salon. We look forward to serving you!`
+    }
+ }
 
 }

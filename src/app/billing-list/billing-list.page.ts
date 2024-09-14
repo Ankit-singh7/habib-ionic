@@ -135,9 +135,7 @@ export class BillingListPage extends RouterPage{
 
                 this.getCurrentStatus();
 
-                this.getPaymentList();
-                this.getAllEmployee()
-                this.getBranchList();
+                this.hardRefresh();
                 this.executed = true;
               }  
             }
@@ -187,6 +185,47 @@ async dateComparePopup() {
   await addAlert.present();
   }
 
+ 
+  async hardRefresh(event = null, hardRefresh = false) {
+    let isDataMissing = false;
+  
+    if (!hardRefresh) {
+      const paymentList = await this.subjectService.getLocalStorage('paymentList');
+      const employeeList = await this.subjectService.getLocalStorage('employeeList');
+      const branchList = await this.subjectService.getLocalStorage('branchList');
+  
+      // Check if any data is missing
+      if (paymentList === null || employeeList === null || branchList === null) {
+        isDataMissing = true;
+      } else {
+        // If all data is found, use it
+        this.payment = paymentList;
+        this.employeeList = employeeList;
+        this.branchList = branchList;
+  
+        // Complete the refresher if it was triggered
+        if (event) {
+          event.target.complete();
+        }
+  
+        // Return early since we have all the cached data
+        return;
+      }
+    }
+  
+    // If hardRefresh is true, or data is missing, call the API to refresh
+    if (hardRefresh || isDataMissing) {
+      await this.getPaymentList();
+      await this.getBranchList();
+      await this.getAllEmployee();
+    }
+  
+    // Complete the refresher if it was triggered
+    if (event) {
+      event.target.complete();
+    }
+  }
+  
 
  getPaymentList(){
    this.payment = [];
@@ -196,9 +235,10 @@ async dateComparePopup() {
       name: item.payment_mode_name
     }))
     this.payment = [...this.payment,...tempArr]
+    let obj = {id:1,name: 'All'}
+    this.payment.unshift(obj)
+    this.subjectService.setLocalStorage('paymentList', this.payment);
   })
-  let obj = {id:1,name: 'All'}
-  this.payment.push(obj)
 }
 
 getAllEmployee(){
@@ -212,6 +252,7 @@ getAllEmployee(){
        }))
        let obj = {id:1,name: 'All'}
        this.employeeList = [obj,...tempArr]
+       this.subjectService.setLocalStorage('employeeList', this.employeeList);
       
 
      } else {
@@ -230,6 +271,7 @@ getBranchList(){
       }))
       let obj = {id:'',name:'All'}
       this.branchList = [obj,...tempArr]
+      this.subjectService.setLocalStorage('branchList', this.branchList);
     } else {
       this.branchList = [];
     }

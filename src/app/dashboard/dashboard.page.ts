@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterPage } from './router.page';
-import { Platform, LoadingController, AlertController } from '@ionic/angular';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { File } from '@ionic-native/file/ngx';
+import { LoadingController, AlertController } from '@ionic/angular';
 import { InvoiceService } from '../services/invoice/invoice.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 import { SubjectService } from '../services/subject/subject.service';
+import { AppointmentService } from '../services/appointment/appointment.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,12 +21,14 @@ export class DashboardPage extends RouterPage {
   public branchId: any;
   public branchName: any;
   public executed = false;
+  public total_advance_booking: any;
 
   constructor(
     private invoiceService: InvoiceService,
     private loading: LoadingController,
     private alertController: AlertController,
     private subjectService: SubjectService,
+    private appointmentService: AppointmentService,
     private router: Router,
     private route: ActivatedRoute) { 
       super(router,route)
@@ -76,111 +77,75 @@ export class DashboardPage extends RouterPage {
 
 
 
-    async getAllBills(){
-
-
-        if(this.role === 'operator') {
-    
-          let loader = await this.loading.create({
-            message: 'Please wait...',
-          });
-      
-          loader.present().then(() => {
-            let data = {
-              branch_id: this.branchId
-            }
-
-             
-          let filterStr = '';
-          for (let item in data) {
-             if(data[item]) {
-               filterStr = `${filterStr}${item}=${data[item]}&`
-             }
-             }
-     
-    
-            this.invoiceService.getAllBill(filterStr).subscribe((res) => {
-                if(res.data?.result) {
-      
-                  this.total = 0
-                  for(let item of res.data.result) {
-                     this.total = this.total + item.total_price
-                  }
-                } else {
-                  this.total = 0;
-                }
-                 loader.dismiss()
-            }, err => loader.dismiss())
-      
-          })
-        } else if(this.role === 'admin'){
-          let loader = await this.loading.create({
-            message: 'Please wait...',
-          });
-      
-          loader.present().then(() => {
-            let data = {
-              branch_id: this.branchId
-            }
-
-             
-          let filterStr = '';
-          for (let item in data) {
-             if(data[item]) {
-               filterStr = `${filterStr}${item}=${data[item]}&`
-             }
-             }
-     
-    
-            this.invoiceService.getAllBill(filterStr).subscribe((res) => {
-                if(res.data?.result) {
-      
-                  this.total = 0
-                  for(let item of res.data.result) {
-                     this.total = this.total + item.total_price
-                  }
-                } else {
-                  this.total = 0;
-                }
-                 loader.dismiss()
-            }, err => loader.dismiss())
-      
-          })
-        } else if( this.role === 'employee') {
-          let loader = await this.loading.create({
-            message: 'Please wait...',
-          });
-    
-          let data = {
-            employee_id: this.userId
-          }
-    
-    
-          let filterStr = '';
-          for (let item in data) {
-             if(data[item]) {
-               filterStr = `${filterStr}${item}=${data[item]}&`
-             }
-             }
-    
-      
-          loader.present().then(() => {
-            this.invoiceService.getAllBill(filterStr).subscribe((res) => {
-                if(res.data.result) {
-      
-                  this.total = 0
-                  for(let item of res.data.result) {
-                     this.total = this.total + item.total_price
-                  }
-                }
-                 loader.dismiss()
-            }, err => loader.dismiss())
-      
-          })
+     async getAllBills(event = null, hardRefresh = false) {    
+      if(!hardRefresh){
+        const storedValue = await this.subjectService.getLocalStorage('totalSalesAmount');      
+        if (storedValue !== null && storedValue !== undefined) {
+          this.total = storedValue;
+          return;
         }
-      
+      }  
+    
+      // Proceed to call the API if no valid cached value is found
+      let loader = await this.loading.create({
+        message: 'Please wait...',
+      });
+    
+      loader.present().then(() => {
+        let data = this.getRoleBasedData();
+        let filterStr = this.generateFilterString(data);
+    
+        this.invoiceService.getAllBill(filterStr).subscribe((res) => {
+          this.processResult(res);
+          loader.dismiss();
+          if (event) {
+            event.target.complete(); // Stop ion-refresher
+          }
+        }, err => {
+          if (event) {
+            event.target.complete(); // Stop ion-refresher
+          }
+          loader.dismiss()
+        });
+      });
     }
-
+    
+    // Function to get data based on role
+    getRoleBasedData() {
+      if (this.role === 'operator' || this.role === 'admin') {
+        return { branch_id: this.branchId };
+      } else if (this.role === 'employee') {
+        return { employee_id: this.userId };
+      }
+      return {};
+    }
+    
+    // Utility function to generate the filter string
+    generateFilterString(data) {
+      let filterStr = '';
+      for (let item in data) {
+        if (data[item]) {
+          filterStr = `${filterStr}${item}=${data[item]}&`;
+        }
+      }
+      return filterStr;
+    }
+    
+    // Utility function to process the result
+    processResult(res) {
+      if (res?.data?.result) {
+        this.total = 0;
+        for (let item of res.data.result) {
+          this.total += item.total_price;
+        }
+    
+        // Update the subject with the total amount after processing the result
+        this.subjectService.setLocalStorage('totalSalesAmount', this.total);
+      } else {
+        this.total = 0;
+      }
+    }
+    
 
    
     
@@ -215,11 +180,6 @@ export class DashboardPage extends RouterPage {
     
     }
   }
-  
-
-
-
-
 
     async presentPrompt() {
 

@@ -124,6 +124,14 @@ export class AppointmentListPage extends RouterPage{
 
     }
 
+    callPhoneNumber(phoneNumber: string) {
+      const a = document.createElement('a');
+      a.href = `tel:${phoneNumber}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
    
   async deleteAppointment(id) {
     const alert = await this.alertController.create({

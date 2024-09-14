@@ -42,6 +42,8 @@ export class CreateAppointmentPage extends RouterPage {
   startTime: string;
   branchId;
   branchName;
+  userId: any;
+  fullName: any;
   constructor(private picker: PickerController,
               private arrayService: DataArrayService,
               private subjectService: SubjectService,
@@ -57,6 +59,15 @@ export class CreateAppointmentPage extends RouterPage {
                   this.branchId = res
                 })
           
+                this.subjectService.getBranchName().subscribe((res) => {
+                  this.branchName = res
+                })
+                this.subjectService.getUserId().subscribe((res) => {
+                  this.userId = res
+                })
+                this.subjectService.getFullName().subscribe((res) => {
+                  this.fullName = res
+                })
                 this.subjectService.getBranchName().subscribe((res) => {
                   this.branchName = res
                 })
@@ -259,7 +270,10 @@ export class CreateAppointmentPage extends RouterPage {
           branch_id: this.branchId,
           branch_name: this.branchName,
           payment_mode: this.selected_payment,
-          booking_amount: this.amount?this.amount:0
+          booking_amount: this.amount?this.amount:0,
+          phone_number: this.customer_whatsapp_number,
+          employee_id: this.userId,
+          employee_name: this.fullName
          }
   
         this.appointmentService.createAppointment(data).subscribe((res) => {
