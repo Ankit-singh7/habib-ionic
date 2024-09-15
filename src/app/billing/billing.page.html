@@ -8,6 +8,9 @@
 <ng-container *ngIf="showCategory && !showAmount && !showPayment && !showBill && !showDualPayment">
 
   <ion-content>
+    <ion-refresher slot="fixed" [pullFactor]="0.5" [pullMin]="100" [pullMax]="200" (ionRefresh)="hardRefresh($event, true)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
 
     <ion-segment class="ion-no-padding tog-back" mode="ios" [(ngModel)]="segment">
       <ion-segment-button class="ion-text-center" mode="ios" value="services">
