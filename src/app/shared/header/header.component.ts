@@ -37,6 +37,9 @@ export class HeaderComponent implements OnInit {
         if (this.activatedRoute === '/con/billing-view') {
           this.title = 'Billing Detail'
         }
+        if (this.activatedRoute === '/con/product-usage-detail') {
+          this.title = 'Product Usage Detail'
+        }
         if (this.activatedRoute === '/con/edit-bill') {
           this.title = 'Edit Bill'
         }

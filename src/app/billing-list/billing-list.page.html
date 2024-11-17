@@ -187,6 +187,10 @@
             <ion-icon slot="start" mode="md" name="eye"></ion-icon>
             View
           </ion-button>
+          <ion-button mode="ios" size="small" color="primary" routerLink="/con/product-usage-detail" [queryParams]="{id:item.bill_id}">
+            <ion-icon slot="start" name="eyedrop-outline"></ion-icon>
+            Product Usage Detail
+          </ion-button>
         </ng-container>
         <ng-container *ngIf="role==='admin'">
 

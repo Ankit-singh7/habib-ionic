@@ -34,6 +34,11 @@ export class MenuService {
   getProductByBrand = (id): Observable<any> => {
     return this.http.get(`${environment.apiURL}/product/${id}/by_brand`)
   }
+  getAllProduct = (): Observable<any> => {
+
+    return this.http.get(`${environment.apiURL}/product`)
+  }
+
 
 
 }

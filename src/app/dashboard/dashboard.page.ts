@@ -169,6 +169,7 @@ export class DashboardPage extends RouterPage {
              }
         this.invoiceService.getCurrentSession(filterStr).subscribe((res) => {
            if(res.data === null) {
+            this.subjectService.setLocalStorage('totalSalesAmount', null);
              this.presentPrompt()
              this.subjectService.setCanWithdraw('true')
            } else {

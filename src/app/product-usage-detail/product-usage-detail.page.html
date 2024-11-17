@@ -1,0 +1,101 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Product Usage Detail</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="billDetail">
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <ion-card-header>
+              <ion-card-subtitle>
+                <p><b>Product Usage Details</b></p>
+                <ion-button mode="ios" size="small" color="primary" class="save-button" (click)="updateBill()">
+                  <ion-icon slot="start" mode="md" name="save"></ion-icon>
+                  Save
+                </ion-button>
+              </ion-card-subtitle>
+             
+            </ion-card-header>
+
+            <ion-row class="bod">
+              <ion-col size="12">
+                <ng-container *ngFor="let item of billDetail.services">
+                  <ion-item lines="full">
+                    <ion-label>
+                      <p>Service Name: <b>{{ item.service_name | titlecase }}</b></p>
+                      <p>Head Count: <b>{{ item.quantity }}</b></p>
+                    </ion-label>
+                  </ion-item>
+                
+                  <ng-container *ngFor="let usage of item.product_usage_detail; let i = index">
+                    <ion-card>
+                      <ion-card-header>
+                        <ion-card-title>Product Usage {{ i + 1 }}</ion-card-title>
+                      </ion-card-header>
+                
+                      <ion-card-content>
+                        <ion-row>
+                          <!-- Product Dropdown -->
+                          <ion-col size="12">
+                            <ionic-selectable
+                              style="margin-left:16px;"
+                              [(ngModel)]="usage.name"
+                              placeholder="Select Product"
+                              class="employee-dropdown-amount"
+                              [items]="productList"
+                              itemValueField="name"
+                              itemTextField="name"
+                              [canSearch]="true"
+                              headerColor="danger">
+                              
+                              <ng-template ionicSelectableCloseButtonTemplate>
+                                <ion-icon name="close-circle"></ion-icon>
+                              </ng-template>
+                              <ng-template ionicSelectableTitleTemplate>
+                                Select Product
+                              </ng-template>
+                            </ionic-selectable>
+                          </ion-col>
+                
+                          <!-- Quantity Input -->
+                          <ion-col size="12">
+                            <ion-item mode="ios" lines="full">
+                              <ion-label mode="ios" position="stacked" style="color: #2c3847;">Quantity</ion-label>
+                              <ion-input
+                                type="number"
+                                placeholder="Enter Quantity"
+                                [(ngModel)]="usage.quantity"
+                                name="quantity-{{ i }}">
+                              </ion-input>
+                            </ion-item>
+                          </ion-col>
+                
+                          <!-- Remove Button -->
+                          <ion-col size="12" class="ion-text-right">
+                            <ion-button color="danger" (click)="removeProduct(item, i)">
+                              Remove
+                            </ion-button>
+                          </ion-col>
+                        </ion-row>
+                      </ion-card-content>
+                    </ion-card>
+                  </ng-container>
+                
+                  <!-- Add More Button -->
+                  <ion-button expand="full" (click)="addMoreProduct(item)">
+                    Add More
+                  </ion-button>
+                </ng-container>
+                
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ng-container>
+</ion-content>

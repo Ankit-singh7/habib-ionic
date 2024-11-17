@@ -36,6 +36,11 @@ const routes: Routes = [
       canActivate: [AuthService]
     },
     {
+      path: 'product-usage-detail',
+      loadChildren: () => import('../product-usage-detail/product-usage-detail.module').then( m => m.ProductUsageDetailPageModule),
+      canActivate: [AuthService]
+    },
+    {
       path: 'session',
       loadChildren: () => import('../session/session.module').then( m => m.SessionPageModule),
       canActivate: [AuthService]
