@@ -54,14 +54,18 @@ export class ProductUsageDetailPage implements OnInit {
         if(this.billDetail.services.length > 0) {
           this.billDetail.services = this.billDetail.services.map((item) => ({
             ...item,
-            product_usage_detail: item.product_usage_detail || [
-              {
-                name: '',
-                quantity: '',
-                product_id: '',
-                unit: '',
-              },
-            ]
+            product_usage_detail:
+            Array.isArray(item.product_usage_detail) && item.product_usage_detail.length > 0
+              ? item.product_usage_detail
+              : [
+                  {
+                    name: '',
+                    quantity: '',
+                    product_id: '',
+                    unit: '',
+                  },
+                ],
+
 
           }))
         }
