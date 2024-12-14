@@ -54,12 +54,13 @@ export class ProductUsageDetailPage implements OnInit {
         if(this.billDetail.services.length > 0) {
           this.billDetail.services = this.billDetail.services.map((item) => ({
             ...item,
-            product_usage_detail : [
+            product_usage_detail: item.product_usage_detail || [
               {
                 name: '',
                 quantity: '',
-                product_id: ''
-              }
+                product_id: '',
+                unit: '',
+              },
             ]
 
           }))
@@ -81,7 +82,8 @@ export class ProductUsageDetailPage implements OnInit {
     item.product_usage_detail.push({
       name: '',
       quantity: '',
-      product_id: ''
+      product_id: '',
+      unit: ''
     });
   }
 
@@ -92,18 +94,21 @@ export class ProductUsageDetailPage implements OnInit {
           const isNameObject = typeof item.name === "object" && item.name !== null;
           const name = isNameObject ? item.name.name : item.name;
           const product_id = isNameObject ? item.name.product_id : item.product_id;
+          const unit = isNameObject ? item.name.uom : item.uom;
   
           return {
             name: name || "",
             product_id: product_id || "",
             quantity: item.quantity || "",
+            unit: unit || ""
           };
         })
         .filter(
           (item) =>
             item.name.trim() !== "" ||
             item.product_id.trim() !== "" ||
-            item.quantity !== ""
+            item.quantity !== "" || 
+            item.unit !== ""
         );
     });
   

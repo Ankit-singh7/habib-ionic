@@ -36,7 +36,7 @@ export class MenuService {
   }
   getAllProduct = (): Observable<any> => {
 
-    return this.http.get(`${environment.apiURL}/product`)
+    return this.http.get(`${environment.apiURL}/service-based-product`)
   }
 
 
