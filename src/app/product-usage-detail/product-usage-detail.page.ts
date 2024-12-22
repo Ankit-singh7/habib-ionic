@@ -30,15 +30,15 @@ export class ProductUsageDetailPage implements OnInit {
       this.route.queryParams.subscribe(params => {
            this.billId = params['id'];
            this.getBillDetail(this.billId)
+           this.getProductList();
       })
       this.subjectService.getRole().subscribe((res) => {
           this.role = res
       })
-       this.getProductList();
+       
     }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
 
   async getBillDetail(id){
@@ -78,7 +78,12 @@ export class ProductUsageDetailPage implements OnInit {
 
   getProductList() {
     this.menuService.getAllProduct().subscribe((res) => {
-      this.productList = res.data;
+      this.productList = res.data.map((item) => ({
+        name: item.name,
+        quantity: '',
+        unit: item.uom,
+        product_id: item.product_id
+      }));
     })
   }
 
@@ -98,7 +103,7 @@ export class ProductUsageDetailPage implements OnInit {
           const isNameObject = typeof item.name === "object" && item.name !== null;
           const name = isNameObject ? item.name.name : item.name;
           const product_id = isNameObject ? item.name.product_id : item.product_id;
-          const unit = isNameObject ? item.name.uom : item.uom;
+          const unit = isNameObject ? item.name.unit : item.unit;
   
           return {
             name: name || "",
@@ -134,6 +139,10 @@ export class ProductUsageDetailPage implements OnInit {
     if (item.product_usage_detail && index > -1) {
       item.product_usage_detail.splice(index, 1);
     }
+  }
+
+  isString(value: any): boolean {
+    return typeof value === 'string';
   }
   
 }

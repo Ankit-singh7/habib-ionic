@@ -122,3 +122,9 @@ p{
   .ionic-selectable-placeholder {
     color: var(--placeholder-color) !important; /* Ensure placeholder color is overridden */
   }
+
+  .selected-product {
+    position: absolute;
+    margin-top: 8px;
+    margin-left: 23px;
+  }

@@ -30,7 +30,7 @@
                       <p>Head Count: <b>{{ item.quantity }}</b></p>
                     </ion-label>
                   </ion-item>
-                
+                  <ng-container *ngIf="item.product_usage_detail && productList">
                   <ng-container *ngFor="let usage of item.product_usage_detail; let i = index">
                     <ion-card>
                       <ion-card-header>
@@ -39,6 +39,9 @@
                 
                       <ion-card-content>
                         <ion-row>
+                          <p class="selected-product">
+                            {{ isString(usage.name) ? usage.name : '' }}
+                          </p>
                           <!-- Product Dropdown -->
                           <ion-col size="12">
                             <ionic-selectable
@@ -50,7 +53,8 @@
                               itemValueField="name"
                               itemTextField="name"
                               [canSearch]="true"
-                              headerColor="danger">
+                              headerColor="danger"
+                              >
                               
                               <ng-template ionicSelectableCloseButtonTemplate>
                                 <ion-icon name="close-circle"></ion-icon>
@@ -84,6 +88,7 @@
                       </ion-card-content>
                     </ion-card>
                   </ng-container>
+                </ng-container>
                 
                   <!-- Add More Button -->
                   <ion-button expand="full" (click)="addMoreProduct(item)">
