@@ -1,0 +1,16 @@
+ion-content {
+    --padding: 16px;
+  }
+  
+  ion-textarea,
+  ion-input {
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px;
+  }
+  
+  ion-button {
+    --border-radius: 8px;
+  }
+  

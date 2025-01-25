@@ -88,6 +88,9 @@ export class HeaderComponent implements OnInit {
         if(this.activatedRoute === '/con/employee-wise-sales') {
           this.title = 'Employee Wise Sales'
         }
+        if(this.activatedRoute === '/con/employee-expense') {
+          this.title = 'Add Your Expense'
+        }
       }
 
     })

@@ -26,5 +26,17 @@ export class UserService {
     return this.http.get(`${environment.apiURL}/branch`);
   }
 
+  getEmployeeExpensesDetail(id, createdOn): Observable<any> {
+    return this.http.get(`${environment.apiURL}/employee-expense/${id}/${createdOn}`);
+  }
+
+  saveEmployeeExpensesDetail(data): Observable<any> {
+    return this.http.post(`${environment.apiURL}/employee-expense`, data);
+  }
+
+  updateEmployeeExpensesDetail(data, id): Observable<any> {
+    return this.http.put(`${environment.apiURL}/employee-expense/${id}`, data);
+  }
+
 
 }

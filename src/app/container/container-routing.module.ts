@@ -92,6 +92,11 @@ const routes: Routes = [
       loadChildren: () => import('../employee-sales-details/employee-sales-details.module').then( m => m.EmployeeSalesDetailsPageModule),
       canActivate: [AuthService]
     },
+    {
+      path: 'employee-expense',
+      loadChildren: () => import('../employee-expense/employee-expense.module').then( m => m.EmployeeExpensePageModule),
+      canActivate: [AuthService]
+    },
   ]
 
 }
