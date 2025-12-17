@@ -179,7 +179,7 @@
           <p><b>Your Sale: &#x20B9; {{item.total_price}}</b></p>
         </ng-container>
         <ng-container *ngIf="role==='operator' || role==='admin'">
-          <ion-button mode="ios" size="small" color="tertiary" routerLink="/edit-bill"  [queryParams]="{id:item.bill_id}">
+          <ion-button mode="ios" size="small" color="tertiary" routerLink="/con/edit-bill"  [queryParams]="{id:item.bill_id}">
             <ion-icon slot="start" mode="md" name="create"></ion-icon>
             Edit
           </ion-button>

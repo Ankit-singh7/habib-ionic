@@ -96,7 +96,7 @@ export class InvoiceService {
   }
 
   updateSession(data,id): Observable<any>{
-    return this.http.post(`${environment.apiURL}/session/${id}/update`,data)
+    return this.http.put(`${environment.apiURL}/session/${id}/update`,data)
   }
 
   uploadPdf(data): Observable<any>{

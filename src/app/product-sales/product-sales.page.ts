@@ -439,59 +439,66 @@ getBranchList(){
   
   
   
-    async presentPrompt() {
-      let alert =await this.alertController.create({
-        header: 'Start your Session',
-        subHeader:'Enter an opening balance to start the day.',
-        mode: 'ios',
-        backdropDismiss: false,
-        inputs: [
-          {
-            name: 'amount',
-            placeholder: 'Opening Balance',
-            type: 'number'
-          },
-        ],
-        buttons: [
-          {
-            text: 'Submit',
-            handler: async data => {
-  
-              if(data.amount) {
-                            
-                let loader = await this.loading.create({
-                  message: 'Please wait...',
-                });
+  async presentPrompt() {
+    let alert =await this.alertController.create({
+      header: 'Start your Session',
+      subHeader:'Enter an opening balance to start the day.',
+      mode: 'ios',
+      backdropDismiss: false,
+      inputs: [
+        {
+          name: 'amount',
+          placeholder: 'Opening Balance',
+          type: 'number'
+        },
+        {
+          name: 'expenseAmount',
+          placeholder: 'Expense Opening Balance',
+          type: 'number'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Submit',
+          handler: async data => {
+
+            if(data.amount && data.expenseAmount) {
+                          
+              let loader = await this.loading.create({
+                message: 'Please wait...',
+              });
+          
+              loader.present().then(() => {
+
             
-                loader.present().then(() => {
-  
-              
-                  const obj = {
-                   session_status:'true',
-                   session_amount: Number(data.amount),
-                   user_name: this.userName,
-                   branch_id: this.branchId,
-                   branch_name: this.branchName,
-                   drawer_balance: Number(data.amount)
-                  }
-   
-                  this.invoiceService.enterSessionAmount(obj).subscribe((res) => {
-                    this.subjectService.setSessionId(res.data.session_id);
-                    this.subjectService.setSessionBalance(res.data.session_amount);
-                       loader.dismiss();
-                  },err => {
-                    loader.dismiss();
-   
-                  })
+                const obj = {
+                 session_status:'true',
+                 session_amount: Number(data.amount),
+                 user_name: this.userName,
+                 branch_id: this.branchId,
+                 branch_name: this.branchName,
+                 drawer_balance: Number(data.amount),
+                 expense_drawer_balance: Number(data.expenseAmount)
+                }
+ 
+                this.invoiceService.enterSessionAmount(obj).subscribe((res) => {
+                  this.getCurrentStatus();
+                  this.subjectService.setSessionId(res.data.session_id);
+                  this.subjectService.setSessionBalance(Number(res.data.session_amount));
+                     loader.dismiss();
+                },err => {
+                  loader.dismiss();
+ 
                 })
-              } else {
-                this.presentPrompt();
-              }
+              })
+            } else {
+              this.presentPrompt();
             }
           }
-        ]
-      });
-      await alert.present();
-    }
+        }
+      ]
+    });
+    await alert.present();
+  }
 
 }

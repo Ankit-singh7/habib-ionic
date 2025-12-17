@@ -1,16 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonicSelectableComponent } from 'ionic-selectable';
-import { Platform, LoadingController } from '@ionic/angular';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
-import { File,FileEntry, IWriteOptions } from '@ionic-native/file/ngx';
+import { Platform, LoadingController, AlertController, ToastController } from '@ionic/angular';
 import { InvoiceService } from '../services/invoice/invoice.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { RouterPage } from '../dashboard/router.page';
+import { ActivatedRoute, Router } from '@angular/router';
+import { generate } from 'shortid';
 import * as moment from 'moment';
+import { SubjectService } from '../services/subject/subject.service';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import domtoimage from 'dom-to-image';
+import { ModeService } from '../services/mode/mode.service';
+import { MenuService } from '../services/service/menu.service';
 import { UserService } from '../services/user/user.service';
-import { RouterPage } from '../dashboard/router.page';
-import { SubjectService } from '../services/subject/subject.service';
+import { AppointmentService } from '../services/appointment/appointment.service';
+
+
+
+
 @Component({
   selector: 'app-edit-bill',
   templateUrl: './edit-bill.page.html',
@@ -18,86 +24,200 @@ import { SubjectService } from '../services/subject/subject.service';
 })
 export class EditBillPage extends RouterPage {
 
-  public billId:any;
-  public billDetail: any;
+  public countryCode = '+91';
+  public number = '7890891405';
+  url: string = `https://wa.me/${this.countryCode}/${this.number}/?text=hi`
+  public pdfObj = null;
   public selectedItems = [];
+  public salonSelectedItems = [];
   public categoryList = [];
   public subCategoryList = [];
-  public selectedCategory:any;
   public showDropDown = false;
   public arrowClass = "arrow-down";
-  public formattedDate;
-  public name:string;
+  public date = new Date();
+  public formattedDate = moment(this.date).format('DD/MM/yy');
+  public name: string;
   public phone: string;
   public altPhone: string;
   public address: string;
-  public selectedEmployee:any;
+  public selectedEmployee: any;
   public selectedPaymentMode: any;
+  public selectedPaymentMode_1: any;
   public selectedPaymentMode_2: any;
   public formError = false;
   public message = '';
-  public sessionId:any;
+  public sessionId: any;
   public drawerBalance: any;
-  public cashIncome:any;
-  netBanking = false;
-  showDetail = true;
+  public cashIncome: any;
+  public billDetail: any;
+  public emptyMessage = 'Please select a category'
+  public total = null
+  public segment = 'services'
+  public employeeList = [];
+  public branchDetail;
+  public billCount;
+
+  payment = [];
+
+  mode = []
+
+  port: string;
+  item = 0;
+  showCategory = true;
+  showAmount = false;
+  showPayment = false;
+  showBill = false;
+  showDualPayment = false;
   dual_payment = false;
-  payment = [
-    { id: 1, name: 'Cash' },
-    { id: 2, name: 'GooglePay' },
-    { id: 3, name: 'PhonePe' },
-    { id: 4, name: 'Card' },
-    { id: 5, name: 'PayTm' }
-  ];
-
-  mode = [
-    { id: 1, name: 'Home Delivery' },
-    { id: 2, name: 'Parcel' },
-    { id: 3, name: 'Dine-In' },
-    { id: 4, name: 'Swiggy' },
-    { id: 5, name: 'Zomato' }
-  ]
-  branchDetail: any;
+  split_amount_1 = null
+  split_amount_2 = null
+  userName: any;
+  netBanking = false;
+  userId: any;
+  role: any;
   branchId: any;
-  constructor(private platform: Platform,
-    private file: File,
-    private fileOpener: FileOpener,
+  branchName: any;
+  executed = false;
+  billId: any;
+  constructor(
+    private platform: Platform,
     private invoiceService: InvoiceService,
+    private menuService: MenuService,
+    private modeService: ModeService,
     private loading: LoadingController,
-    private router: Router,
-    private userService: UserService,
-    private socialSharing: SocialSharing,
     private subjectService: SubjectService,
-    private route: ActivatedRoute) { 
-      super(router,route)
-      this.route.queryParams.subscribe(params => {
-           this.billId = params['id'];
-           this.getBillDetail(this.billId)
-          
+    private appointmentService: AppointmentService,
+    private alertController: AlertController,
+    private router: Router,
+    private socialSharing: SocialSharing,
+    private userService: UserService,
+    private toastController: ToastController,
+    private route: ActivatedRoute) {
+    super(router, route)
+    this.route.queryParams.subscribe(params => {
+      this.billId = params['id'];
+      this.getBillDetail(this.billId)
+     
+ })
+  }
+
+  ionViewDidDestroy() {
+    this.booking_amount = 0;
+   }
+
+
+
+  onEnter() {
+    this.subjectService.getSessionId().subscribe((res) => {
+      this.sessionId = res
+    })
+
+
+    this.subjectService.getFullName().subscribe((res) => {
+      this.userName = res;
+      this.subjectService.getUserId().subscribe((res) => {
+        this.userId = res
+        this.subjectService.getRole().subscribe((res) => {
+          this.role = res
+          this.subjectService.getBranchId().subscribe((res) => {
+            this.branchId = res
+            this.subjectService.getBranchName().subscribe((res) => {
+              this.branchName = res
+              if (!this.executed) {
+
+                if (this.userName !== null && this.userId !== null && this.role !== null && this.branchId !== null && this.branchName !== null) {
+                  this.hardRefresh();
+                  this.executed = true;
+                }
+              }
+
+            })
+          })
+        })
       })
-      this.subjectService.getBranchId().subscribe((res) => {
-        this.branchId = res
-        this.getBranchDetail(this.branchId)
-      })
+    })
+  }
+
+  async hardRefresh(event = null, hardRefresh = false) {
+    let isDataMissing = false;
+  
+    if (!hardRefresh) {
+      const paymentList = await this.subjectService.getLocalStorage('paymentListBilling');
+      const employeeList = await this.subjectService.getLocalStorage('employeeList');
+      const brandList = await this.subjectService.getLocalStorage('brandList');
+      const serviceCategoryList = await this.subjectService.getLocalStorage('serviceCategoryList');
+      const branchDetail = await this.subjectService.getLocalStorage('branchDetail');
+      // Check if any data is missing
+      if (paymentList === null || employeeList === null || brandList === null || serviceCategoryList === null || branchDetail === null) {
+        isDataMissing = true;
+      } else {
+        // If all data is found, use it
+        this.payment = paymentList;
+        this.employeeList = employeeList;
+        this.brandList = brandList
+        this.serviceCategoryList = serviceCategoryList
+        this.branchDetail = branchDetail
+  
+        // Complete the refresher if it was triggered
+        if (event) {
+          event.target.complete();
+        }
+  
+        // Return early since we have all the cached data
+        return;
+      }
     }
-
-  ngOnInit() {
+  
+    // If hardRefresh is true, or data is missing, call the API to refresh
+    if (hardRefresh || isDataMissing) {
+      await this.getPaymentList();
+      await this.getBrand();
+      await this.getAllEmployee();
+      await this.getServiceCategory();
+      await this.getBranchDetail(this.branchId);
+    }
+  
+    // Complete the refresher if it was triggered
+    if (event) {
+      event.target.complete();
+    }
   }
 
 
-  onDualChange(){
-    console.log(this.dual_payment)
+  ionViewDidLeave() {
+    this.executed = false
   }
 
-
-  ionViewDidEnter(){
-    this.getAllEmployee()
+  async pasteTextFromClipboard() {
+    try {
+      const id = await navigator.clipboard.readText();
+      this.appointmentId = id;
+      const toast = await this.toastController.create({
+        message: 'Text pasted from clipboard!',
+        duration: 2000,
+        position: 'bottom',
+        color: 'success'
+      });
+      toast.present();
+    } catch (error) {
+      const toast = await this.toastController.create({
+        message: 'Failed to read clipboard contents.',
+        duration: 2000,
+        position: 'bottom',
+        color: 'danger'
+      });
+      toast.present();
+    }
   }
 
-  onEnter(){
-
+  getBranchDetail(id) {
+    this.invoiceService.getBranchDetail(id).subscribe((res) => {
+      if (res.data) {
+        this.branchDetail = res.data
+        this.subjectService.setLocalStorage('branchDetail', this.branchDetail)
+      }
+    })
   }
-
 
   async getBillDetail(id){
     let loader = await this.loading.create({
@@ -106,26 +226,29 @@ export class EditBillPage extends RouterPage {
 
     loader.present().then(() => {
       
-      this.invoiceService.getBillDetail(id).subscribe((res) => {
+      this.invoiceService.getBillDetail(id).subscribe(async (res) => {
+      await this.getAllEmployee();
       if(res.data) {
         this.billDetail = res.data
-        if(this.billDetail.dual_payment_mode === 'true') {
-          this.dual_payment = true
-        } else {
-          this.dual_payment = false
-        }
+        this.billDetail.dual_payment_mode = this.billDetail.dual_payment_mode === "true"
         if(this.billDetail.payment_mode === 'Net Banking') {
           this.selectedPaymentMode = {id:0,name:'Net Banking'}
+          this.selectedPaymentMode_1 = {id:0,name:'Net Banking'}
         } else if(this.billDetail.payment_mode === 'Cash') {
           this.selectedPaymentMode = {id:1,name:'Cash'}
-        } else if(this.billDetail.payment_mode === 'GooglePay') {
-          this.selectedPaymentMode = {id:2,name:'GooglePay'}
-        } else if(this.billDetail.payment_mode === 'PhonePe') {
-          this.selectedPaymentMode = {id:3,name:'PhonePe'}
+          this.selectedPaymentMode_1 = {id:1,name:'Cash'}
+        } else if(this.billDetail.payment_mode === 'Google Pay') {
+          this.selectedPaymentMode = {id:2,name:'Google Pay'}
+          this.selectedPaymentMode_1 = {id:2,name:'Google Pay'}
+        } else if(this.billDetail.payment_mode === 'Phone Pe') {
+          this.selectedPaymentMode = {id:3,name:'Phone Pe'}
+          this.selectedPaymentMode_1 = {id:3,name:'Phone Pe'}
         } else if(this.billDetail.payment_mode === 'Card') {
           this.selectedPaymentMode = {id:4,name:'Card'}
+          this.selectedPaymentMode_1 = {id:4,name:'Card'}
         }else if(this.billDetail.payment_mode === 'PayTm') {
           this.selectedPaymentMode = {id:5,name:'PayTm'}
+          this.selectedPaymentMode_1 = {id:5,name:'PayTm'}
         }
 
 
@@ -133,161 +256,1141 @@ export class EditBillPage extends RouterPage {
           this.selectedPaymentMode_2 = {id:0,name:'Net Banking'}
         } else if(this.billDetail.payment_mode_2 === 'Cash') {
           this.selectedPaymentMode_2 = {id:1,name:'Cash'}
-        } else if(this.billDetail.payment_mode_2 === 'GooglePay') {
-          this.selectedPaymentMode_2 = {id:2,name:'GooglePay'}
-        } else if(this.billDetail.payment_mode_2 === 'PhonePe') {
-          this.selectedPaymentMode_2 = {id:3,name:'PhonePe'}
+        } else if(this.billDetail.payment_mode_2 === 'Google Pay') {
+          this.selectedPaymentMode_2 = {id:2,name:'Google Pay'}
+        } else if(this.billDetail.payment_mode_2 === 'Phone Pe') {
+          this.selectedPaymentMode_2 = {id:3,name:'Phone Pe'}
         } else if(this.billDetail.payment_mode_2 === 'Card') {
           this.selectedPaymentMode_2 = {id:4,name:'Card'}
         }else if(this.billDetail.payment_mode_2 === 'PayTm') {
           this.selectedPaymentMode_2 = {id:5,name:'PayTm'}
         }
 
-
-
         this.selectedEmployee  = {user_id: this.billDetail.employee_id, name: this.billDetail.employee_name}
+        if(this.billDetail?.services.length>0) {
+          const selectedObj = this.billDetail.services.map((item) => ({
+            employee_id: item.employee_id,
+            showIncrement: true,
+            selected_employee: this.employeeList.filter((emp) =>  emp.user_id === item.employee_id)[0],
+            employee_name: item.employee_name,
+            total: item.total,
+            count: item.quantity,
+            name: item.service_name,
+            service_id: item.service_id
+        }))
+        this.selectedItems.push(...selectedObj);
+        this.salonSelectedItems.push(...selectedObj);
+          this.showDropDown = true;
+        }
+        if(this.billDetail?.products.length>0) {
+          const selectedObj =  this.billDetail.products.map((item) => ({
+              employee_id: item.employee_id,
+              showIncrement: true,
+              selected_employee: this.employeeList.filter((emp) =>  emp.user_id === item.employee_id)[0],
+              employee_name: item.employee_name,
+              total: item.total,
+              count: item.quantity,
+              name: item.product_name,
+              product_id: item.product_id
+          }))
+          this.selectedItems.push(...selectedObj);
+          this.salonSelectedItems.push(...selectedObj);
+          this.showDropDown = true;
+        }
 
+        this.item = this.billDetail.services.length + this.billDetail.products.length;
 
-        console.log('payment', this.selectedPaymentMode)
+        console.log('inside bill detail', this.selectedItems)
+
+        this.total = this.selectedItems.reduce((acc,curr) => {
+              acc=acc+curr.total;
+              return acc;
+        },0)
+        console.log("total",this.total)
 
 
 
         this.formattedDate = moment(res.data.createdOn).format('DD/MM/yy');
+        this.getMostlyUsedProductList();
+        this.getMostlyUsedServiceList();
       }
       loader.dismiss()
       }, err => loader.dismiss())
     })
   }
 
-  public employeeList = [];
-  getAllEmployee(){
-    this.userService.getAllEmployee().subscribe((res) => {
-       if(res.data.result) {
-         this.employeeList = res.data.result.map((item) => ({
-           name: `${item.f_name} ${item.l_name}`,
-           ...item
-  
-         }))
-      
-       } else {
-         this.employeeList = [];
-       }
+
+
+  getPaymentList() {
+    this.modeService.getPaymentModeList().subscribe((res) => {
+      this.payment = res.data.map((item) => ({
+        id: item.payment_mode_id,
+        name: item.payment_mode_name
+      }))
+    this.subjectService.setLocalStorage('paymentListBilling', this.payment);
     })
   }
 
-  getBranchDetail(id) {
-    this.invoiceService.getBranchDetail(id).subscribe((res) => {
-      if(res.data) {
-        this.branchDetail = res.data
-      }
-    })
+
+
+
+
+
+  public selectServiceCategory: any;
+  public selectedBrandCategory: any;
+  categoryChange(event: {
+    component: IonicSelectableComponent,
+    value: any
+  }, type) {
+
+    if (type === 'service') {
+      this.selectServiceCategory = event.value
+      this.getServiceList(this.selectServiceCategory.service_type_id)
+
+    } else if (type === 'product') {
+
+      this.selectedBrandCategory = event.value
+      this.getProductList(this.selectedBrandCategory.brand_id)
+
+    }
+
+
+
   }
 
+  paymentChange(event: {
+    component: IonicSelectableComponent,
+    value: any
+  }, val) {
+    console.log(event.value)
+    if (val === 'payment_single') {
+      this.selectedPaymentMode = ''
+      this.selectedPaymentMode = event.value
+    } else if (val === 'payment_1') {
+      this.selectedPaymentMode_1 = ''
+      this.selectedPaymentMode_1 = event.value
+    } else if (val === 'payment_2') {
+      this.selectedPaymentMode_2 = ''
+      this.selectedPaymentMode_2 = event.value
+    }
+  }
 
   employeeChange(event: {
     component: IonicSelectableComponent,
     value: any
   }) {
-    this.selectedEmployee  =''
+    this.selectedEmployee = ''
     this.selectedEmployee = event.value
-    console.log(this.selectedEmployee);
   }
 
 
-    paymentChange(event: {
+  billingEmployee(event: {
     component: IonicSelectableComponent,
     value: any
-  }) {
-    this.selectedPaymentMode  =''
-    this.selectedPaymentMode = event.value
+  }, item) {
+    console.log('selectedemployee', event?.value)
+    item.selected_employee = ''
+    item.selected_employee = event?.value
+    item.employee_id = event?.value?.user_id
+    item.employee_name = event.value?.name
   }
 
-
-
-
-
-
-  async editBill(){
-    let loader = await this.loading.create({
-      message: 'Please wait...',
-    });
-
-    loader.present().then(() => {
-      if(this.dual_payment){
-
-        this.billDetail.payment_mode = this.selectedPaymentMode.name
-        this.billDetail.payment_mode_2 = this.selectedPaymentMode_2.name
-        this.billDetail.employee_id = this.selectedEmployee.user_id
-        this.billDetail.employee_name = this.selectedEmployee.name
-        this.billDetail.customer_name = this.billDetail.customer_name.toLowerCase()
-        this.billDetail.dual_payment_mode = this.dual_payment
-      } else {
-        this.billDetail.payment_mode = this.selectedPaymentMode.name
-        this.billDetail.employee_id = this.selectedEmployee.user_id
-        this.billDetail.employee_name = this.selectedEmployee.name
-        this.billDetail.customer_name = this.billDetail.customer_name.toLowerCase()
-        this.billDetail.dual_payment_mode = this.dual_payment
-      }
-      this.invoiceService.updateBill(this.billDetail,this.billId).subscribe((res) => {
-        this.router.navigate(['/con/billing-list'])
-        loader.dismiss()
-      },err=> {
-        loader.dismiss()
-      })
-    }) 
-  }
-
-  async editandSendBill(){
-    let loader = await this.loading.create({
-      message: 'Please wait...',
-    });
-
-    loader.present().then(() => {
-      this.billDetail.payment_mode = this.selectedPaymentMode.name
-      this.billDetail.employee_id = this.selectedEmployee.user_id
-      this.billDetail.employee_name = this.selectedEmployee.name
-      this.invoiceService.updateBill(this.billDetail,this.billId).subscribe((res) => {
-        this.domToI()
+  showEdit(val) {
+    console.log('show edit', val);
+    val.showIncrement = true;
+    this.total += val.price;
+    this.item++;
+    console.log("selectedItems before", this.selectedItems);
   
-        loader.dismiss()
-      },err=> {
-        loader.dismiss()
-      })
-    }) 
+    if (val?.service_id || val?.product_id) {
+      this.salonSelectedItems.push(val);
+      this.selectedItems.push(val);
+    }
+  
+    // At the end, deduplicate both arrays
+    const getUniqueByKey = (arr, key) => {
+      return arr.filter((item, index, self) =>
+        key in item
+          ? self.findIndex(i => i[key] === item[key]) === index
+          : true
+      );
+    };
+  
+    this.selectedItems = getUniqueByKey(this.selectedItems, 'service_id');
+    this.selectedItems = getUniqueByKey(this.selectedItems, 'product_id');
+  
+    this.salonSelectedItems = getUniqueByKey(this.salonSelectedItems, 'service_id');
+    this.salonSelectedItems = getUniqueByKey(this.salonSelectedItems, 'product_id');
+  
+    console.log("selectedItems after", this.selectedItems);
   }
 
+  increment(val: any, type) {
+    console.log(val);
+    let tempObj = JSON.parse(JSON.stringify(val))
+    if(type === 'service'){
+      if(this.salonSelectedItems.find((item) => item.service_id !== val.service_id)) {
+        this.salonSelectedItems.push(tempObj)
+      }
+    } else if(type === 'product'){
+      if(this.salonSelectedItems.find((item) => item.product_id !== val.product_id)) {
+        this.salonSelectedItems.push(tempObj)
+      }  
+    }
+    val.count++
+    this.total += val.price
+    this.item++;
+    if (type === 'service') {
+      for (let item of this.selectedItems) {
+        if (item?.service_id) {
 
-  async domToI(){
+          if (item.service_id === val.service_id) {
+            item.count = val.count
+          }
+        } else {
+          continue;
+        }
+      }
+    } else if (type === 'product') {
+      for (let item of this.selectedItems) {
+        if (item?.product_id) {
+          if (item.product_id === val.product_id) {
+            item.count = val.count
+          }
+
+        } else {
+          continue;
+        }
+      }
+    }
+
+  }
+
+  decrement(val, type) {
+    if (val.count !== 1) {
+      val.count--
+      this.total -= val.price
+      this.item--;
+      if (type === 'service') {
+        for (let item of this.selectedItems) {
+          if (item?.service_id) {
+
+            if (item.service_id === val.service_id) {
+              item.count = val.count
+
+            }
+          } else {
+            continue;
+          }
+        }
+
+        for (let i = 0; i < this.salonSelectedItems.length; i++) {
+          if (this.salonSelectedItems[i].service_id) {
+            if (this.salonSelectedItems[i].service_id === val.service_id) {
+              this.salonSelectedItems.splice(i, 1)
+              break;
+            }
+          }
+        }
+
+      } else if (type === 'product') {
+        for (let item of this.selectedItems) {
+          if (item?.product_id) {
+
+            if (item.product_id === val.product_id) {
+              item.count = val.count
+            }
+          } else {
+            continue;
+          }
+        }
+
+        for (let i = 0; i < this.salonSelectedItems.length; i++) {
+          if (this.salonSelectedItems[i].product_id) {
+            if (this.salonSelectedItems[i].product_id === val.product_id) {
+              this.salonSelectedItems.splice(i, 1)
+              break;
+            }
+          }
+        }
+
+      }
+
+
+    } else {
+      val.showIncrement = false;
+      this.total -= val.price;
+      this.item--;
+      for (let i = 0; i < this.selectedItems.length; i++) {
+        if (type === 'service') {
+          if (this.selectedItems[i].service_id) {
+
+            if (this.selectedItems[i].service_id === val.service_id) {
+              this.selectedItems.splice(i, 1);
+            }
+          }
+        } else if (type === 'product') {
+          if (this.selectedItems[i].product_id) {
+
+            if (this.selectedItems[i].product_id === val.product_id) {
+              this.selectedItems.splice(i, 1);
+
+            }
+          }
+        }
+      }
+
+      for (let i = 0; i < this.salonSelectedItems.length; i++) {
+        if (type === 'service') {
+          if (this.salonSelectedItems[i].service_id) {
+            if (this.salonSelectedItems[i].service_id === val.service_id) {
+              this.salonSelectedItems.splice(i, 1)
+              break;
+            }
+          }
+
+        } else if (type === 'product') {
+          for (let i = 0; i < this.salonSelectedItems.length; i++) {
+            if (this.salonSelectedItems[i].product_id) {
+              if (this.salonSelectedItems[i].product_id === val.product_id) {
+                this.salonSelectedItems.splice(i, 1)
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  addTotal() {
+    for (let item of this.salonSelectedItems) {
+      if (item.total) {
+
+        this.total = this.total + parseInt(item.total)
+      }
+    }
+
+  }
+  // For Service Related API
+
+  public serviceCategoryList = [];
+  async getServiceCategory() {
     let loader = await this.loading.create({
-      message: 'Generating Bill...',
+      message: 'Please wait...',
     });
 
     loader.present().then(() => {
-      
+      this.menuService.getAllServiceCatergory().subscribe((res) => {
+        this.serviceCategoryList = res.data;
+        loader.dismiss();
+        this.subjectService.setLocalStorage('serviceCategoryList', this.serviceCategoryList);
+      }, err => loader.dismiss())
+    })
+
+  }
+
+  public brandList = [];
+  async getBrand() {
+    let loader = await this.loading.create({
+      message: 'Please wait...',
+    });
+
+    loader.present().then(() => {
+      this.menuService.getAllBrand().subscribe((res) => {
+        this.brandList = res.data;
+        this.subjectService.setLocalStorage('brandList', this.brandList);
+        loader.dismiss();
+      }, err => loader.dismiss())
+    })
+
+  }
+
+  public serviceList = [];
+  async getServiceList(id) {
+    this.serviceList = [];
+    let loader = await this.loading.create({
+      message: 'Please wait...',
+    });
+
+    loader.present().then(() => {
+      this.menuService.getServiceByCategory(id).subscribe((res) => {
+        if (res.data) {
+
+          this.serviceList = res.data.map((item) => ({
+            ...item,
+            'showIncrement': false,
+            'count': 1,
+            'selected_employee': null,
+            'employee_id': null,
+            'employee_name': '',
+            'total': null
+          }));
+
+          for (let item of this.selectedItems) {
+            if (item?.service_id) {
+              for (let list of this.serviceList) {
+                if (item.service_id === list.service_id) {
+                  list.count = item.count
+                  list.showIncrement = true
+                  list.selected_employee = item.selected_employee
+                  list.employee_id = item.employee_id
+                  list.employee_name = item.employee_name
+                } else {
+                  continue;
+                }
+
+              }
+            } else {
+              continue;
+            }
+          }
+        } else {
+          this.emptyMessage = 'No items found.'
+        }
+
+        loader.dismiss();
+
+      }, err => loader.dismiss())
+    })
+  }
+
+  async getMostlyUsedServiceList() {
+    let loader = await this.loading.create({
+      message: 'Please wait...',
+    });
+
+    loader.present().then(() => {
+      this.menuService.getActiveService().subscribe((res) => {
+        if (res.data) {
+
+          this.serviceList = res.data.map((item) => ({
+            ...item,
+            'showIncrement': false,
+            'count': 1,
+            'selected_employee': null,
+            'employee_id': null,
+            'employee_name': '',
+            'total': null
+          }));
+          console.log("inside mostly used service list", this.selectedItems);
+          for (let item of this.selectedItems) {
+            if (item?.service_id) {
+              for (let list of this.serviceList) {
+                if (item.service_id === list.service_id) {
+                  list.count = item.count
+                  list.showIncrement = true
+                  list.selected_employee = item.selected_employee
+                  list.employee_id = item.employee_id
+                  list.employee_name = item.employee_name
+                } else {
+                  continue;
+                }
+              }
+            } else {
+              continue;
+            }
+          }
+        } else {
+          this.emptyMessage = 'No Mostly Used Service Added.'
+        }
+
+        loader.dismiss();
+
+      }, err => loader.dismiss())
+    })
+  }
+
+  // End Service related API
+
+
+  // For Product related API
+
+
+  public productList = [];
+  async getProductList(id) {
+    this.productList = [];
+    let loader = await this.loading.create({
+      message: 'Please wait...',
+    });
+
+    loader.present().then(() => {
+      this.menuService.getProductByBrand(id).subscribe((res) => {
+        if (res.data) {
+
+          this.productList = res.data.map((item) => ({
+            ...item,
+            'showIncrement': false,
+            'count': 1,
+            'selected_employee': null,
+            'employee_id': null,
+            'employee_name': '',
+            'total': null
+          }));
+
+          for (let item of this.selectedItems) {
+            if (item?.product_id) {
+              for (let list of this.productList) {
+                if (item.product_id === list.product_id) {
+                  list.count = item.count
+                  list.showIncrement = true
+                  list.selected_employee = item.selected_employee
+                  list.employee_id = item.employee_id
+                  list.employee_name = item.employee_name
+                } else {
+                  continue;
+                }
+              }
+            } else {
+              continue;
+            }
+          }
+        } else {
+          this.emptyMessage = 'No items found.'
+        }
+
+        loader.dismiss();
+
+      }, err => loader.dismiss())
+    })
+  }
+
+  async getMostlyUsedProductList() {
+
+    this.menuService.getActiveProduct().subscribe((res) => {
+      if (res.data) {
+
+        this.productList = res.data.map((item) => ({
+          ...item,
+          'showIncrement': false,
+          'count': 1,
+          'selected_employee': null,
+          'employee_id': null,
+          'employee_name': '',
+          'total': null
+        }));
+
+        for (let item of this.selectedItems) {
+          if (item?.product_id) {
+            for (let list of this.productList) {
+              if (item.product_id === list.product_id) {
+                list.count = item.count
+                list.showIncrement = true
+                list.selected_employee = item.selected_employee
+                list.employee_id = item.employee_id
+                list.employee_name = item.employee_name
+              } else {
+                continue;
+              }
+            }            
+          } else {
+            continue;
+          }
+        }
+      } else {
+        this.emptyMessage = 'No Mostly Used Products Added.'
+      }
+
+
+
+    })
+  }
+
+
+  // End Product related API
+
+
+  // Get All Employee List
+
+  getAllEmployee() {
+    this.userService.getAllEmployee('status=Active').subscribe((res) => {
+      if (res.data) {
+        this.employeeList = res.data.result.map((item) => ({
+          name: `${item.f_name} ${item.l_name}`,
+          ...item
+
+        }))
+        this.subjectService.setLocalStorage('employeeList', this.employeeList);
+      } else {
+        this.employeeList = [];
+      }
+    })
+  }
+  toggleCategory() {
+    this.getMostlyUsedProductList()
+    this.getMostlyUsedServiceList()
+    this.showCategory = true;
+    this.showPayment = false;
+    this.showAmount = false;
+    this.showBill = false;
+    this.showDualPayment = false
+  }
+
+  toggleAmount() {
+    this.showCategory = false;
+    this.showPayment = false;
+    this.showAmount = true;
+    this.showBill = false;
+    this.showDualPayment = false;
+  }
+
+  togglePayment() {
+    this.showCategory = false;
+    this.showPayment = true;
+    this.showAmount = false;
+    this.showBill = false;
+    this.showDualPayment = false
+    this.dual_payment = false;
+  }
+
+
+  toggleBill() {
+    this.showCategory = false;
+    this.showPayment = false;
+    this.showAmount = false;
+    this.showBill = true;
+    this.showDualPayment = false;
+  }
+
+
+  toggleSplitAmount() {
+    this.showCategory = false;
+    this.showPayment = false;
+    this.showBill = false;
+    this.showDualPayment = true
+  }
+
+
+  deleteSelectedItem(val) {
+    if (val?.service_id) {
+
+
+      this.salonSelectedItems = this.salonSelectedItems.filter(item => item.service_id !== val.service_id)
+      for (let i = 0; i < this.selectedItems.length; i++) {
+        if (this.selectedItems[i]?.service_id) {
+          if (val.service_id === this.selectedItems[i].service_id) {
+            this.total = this.total - (val.count * val.price)
+            this.item = this.item - val.count
+            this.selectedItems.splice(i, 1)
+
+
+          }
+        }
+      }
+      for (let list of this.serviceList) {
+        if (val.service_id === list.service_id) {
+          list.count = 1
+          list.showIncrement = false
+        } else {
+          continue;
+        }
+      }
+    } else if (val?.product_id) {
+      this.salonSelectedItems = this.salonSelectedItems.filter(item => item.product_id !== val.product_id)
+      for (let i = 0; i < this.selectedItems.length; i++) {
+        if (this.selectedItems[i]?.product_id) {
+          if (val.product_id === this.selectedItems[i].product_id) {
+            this.total = this.total - (val.count * val.price)
+            this.item = this.item - val.count
+            this.selectedItems.splice(i, 1)
+
+          }
+        }
+      }
+      for (let i = 0; i <= this.salonSelectedItems.length; i++) {
+        if (this.salonSelectedItems[i].product_id) {
+          if (this.salonSelectedItems[i].product_id === val.product_id) {
+            this.salonSelectedItems.splice(i, 1)
+          }
+        }
+      }
+      for (let list of this.productList) {
+        if (val.product_id === list.product_id) {
+          list.count = 1
+          list.showIncrement = false
+        } else {
+          continue;
+        }
+      }
+    }
+
+  }
+
+  incrementSelectedItem(val) {
+    let tempObj = JSON.parse(JSON.stringify(val))
+    this.salonSelectedItems.push(tempObj)
+    val.count++
+    this.item++
+    this.total = this.total + val.price
+
+    if (val?.service_id) {
+
+      for (let list of this.serviceList) {
+        if (val.service_id === list.service_id) {
+          list.count = val.count
+
+        } else {
+          continue;
+        }
+      }
+    } else if (val?.product_id) {
+      for (let list of this.productList) {
+        if (val.product_id === list.product_id) {
+          list.count = val.count
+        } else {
+          continue;
+        }
+      }
+    }
+
+  }
+
+  decrementSelectedItem(val) {
+    if (val.count === 1) {
+      this.deleteSelectedItem(val)
+    } else {
+      val.count--
+      this.item--
+      this.total = this.total - val.price
+      if (val?.service_id) {
+
+        for (let list of this.serviceList) {
+          if (val.service_id === list.service_id) {
+            list.count = val.count
+
+          } else {
+            continue;
+          }
+        }
+
+        for (let i = 0; i < this.salonSelectedItems.length; i++) {
+          if (this.salonSelectedItems[i].service_id) {
+            if (this.salonSelectedItems[i].service_id === val.service_id) {
+              this.salonSelectedItems.splice(i, 1)
+              break;
+            }
+          }
+        }
+      } else if (val?.product_id) {
+
+        for (let list of this.productList) {
+          if (val.product_id === list.product_id) {
+            list.count = val.count
+
+          } else {
+            continue;
+          }
+        }
+        for (let i = 0; i < this.salonSelectedItems.length; i++) {
+          if (this.salonSelectedItems[i].product_id) {
+            if (this.salonSelectedItems[i].product_id === val.product_id) {
+              this.salonSelectedItems.splice(i, 1)
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  toggledropDown() {
+    this.showDropDown = !this.showDropDown
+    if (this.showDropDown === true) {
+      this.arrowClass = 'arrow-up'
+    } else {
+      this.arrowClass = 'arrow-down'
+    }
+  }
+
+  checkValidation() {
+    this.formError = false;
+    if (!this.selectedPaymentMode && !this.dual_payment) {
+      this.message = 'Payment mode is required.'
+      this.formError = true;
+    } else if (!this.selectedPaymentMode_1 && !this.selectedPaymentMode_2 && this.dual_payment) {
+      this.message = 'Please select both payment modes.'
+      this.formError = true;
+    } else if (!this.total) {
+      this.message = 'Total Bill Amount is required'
+      this.formError = true;
+    } else if (this.billDetail.split_amount_1 && this.billDetail.split_amount_2) {
+      const totalSplitAmount = +this.billDetail.split_amount_1 + +this.billDetail.split_amount_2
+        if( totalSplitAmount !== this.total) {
+          this.message = 'split amounts sum is not same as total amount'
+          this.formError = true;
+        } else {
+          this.formError = false;
+      if (this.appointmentId) {
+        this.findCustomerBookingDetail(this.billId)
+      } else {
+        this.showGenerateBill(this.billId);
+      }
+        }
+    } else {
+      this.formError = false;
+      if (this.appointmentId) {
+        this.findCustomerBookingDetail(this.billId)
+      } else {
+        this.showGenerateBill(this.billId);
+      }
+    }
+
+  }
+
+  public booking_amount = 0;
+  public appointmentId;
+  async findCustomerBookingDetail(billId) {
+    let loader = await this.loading.create({
+      message: 'Finding Customer Details...',
+
+    });
+
+    loader.present().then(() => {
+
+      this.appointmentService.getAppointmentDetail(this.appointmentId).subscribe((res) => {
+        if (res.data) {
+          this.booking_amount = res.data.booking_amount
+          loader.dismiss()
+        } else {
+          this.booking_amount = 0;
+          this.appointmentId = '';
+        }
+        loader.dismiss()
+      }, err => loader.dismiss())
+    })
+  }
+
+  downloadPdf() {
+    if (this.platform.is('cordova')) {
+
+    } else {
+      this.pdfObj.download();
+    }
+  }
+
+  not_valid_employee = false
+  checkEmployeeValidation() {
+    console.log(this.salonSelectedItems)
+    for (let item of this.salonSelectedItems) {
+      if (!item.employee_id && !item.employee_name) {
+        this.not_valid_employee = true
+        this.message = 'Please select employee'
+      } else if(item.total === null) {
+        this.not_valid_employee = true
+        this.message = 'Please enter total of all the service/product'
+      }else {
+        this.not_valid_employee = false
+        this.message = ''
+      }
+    }
+
+    if (!this.not_valid_employee) {
+      this.togglePayment()
+    }
+
+  }
+
+  public PurchasedArr = [];
+  public prodArr = [];
+  public servArr = [];
+  public displayServArr = [];
+  public displayProdArr = [];
+
+  async showGenerateBill(id) {
+    let total;
+    this.prodArr = [];
+    this.servArr = [];
+    this.displayServArr = [];
+    this.displayProdArr = [];
+
+    total = Number(this.total) - this.booking_amount
+    for (let item of this.salonSelectedItems) {
+      if (item?.product_id) {
+        let obj = {
+          product_name: item.name,
+          product_id: item.product_id,
+          quantity: 1,
+          total: item.total,
+          employee_id: item.employee_id,
+          employee_name: item.employee_name
+        }
+        this.prodArr.push(obj)
+      } else if (item?.service_id) {
+        let obj = {
+          service_name: item.name,
+          service_id: item.service_id,
+          quantity: 1,
+          total: item.total,
+          employee_id: item.employee_id,
+          employee_name: item.employee_name
+        }
+
+        this.servArr.push(obj)
+
+      }
+    }
+    
+    this.billDetail.services = this.servArr;
+    this.billDetail.products = this.prodArr;
+    this.billDetail.total_price = this.total;
+    if(this.billDetail.dual_payment_mode) {
+      this.billDetail.payment_mode = this.selectedPaymentMode_1.name
+      this.billDetail.payment_mode_2 = this.selectedPaymentMode_2.name
+      this.billDetail.total_price = parseInt(this.billDetail.split_amount_1) + parseInt(this.billDetail.split_amount_2)
+    } else {
+      this.billDetail.payment_mode_1 = this.selectedPaymentMode.name || this.selectedPaymentMode_1.name
+      this.billDetail.total_price = this.total
+    }
+    this.toggleBill();
+
+
+  }
+
+
+  updateDrawerBalance(bal, id) {
+    let totalCashIncome = Number(bal) + Number(this.cashIncome)
+    let drawerBalance = Number(this.drawerBalance) + Number(bal)
+    const data = {
+      cash_income: totalCashIncome,
+      drawer_balance: drawerBalance
+    }
+    this.invoiceService.updateSession(data, id).subscribe((res) => {
+
+    }, err => console.log(err))
+
+  }
+
+
+
+  getCurrentStatus() {
+
+
+    if (this.role === 'operator') {
+      let data = {
+
+        branch_id: this.branchId,
+        date: moment(new Date()).format('DD-MM-YYYY'),
+
+      }
+      let filterStr = '';
+      for (let item in data) {
+        if (data[item]) {
+          filterStr = `${filterStr}${item}=${data[item]}&`
+        }
+      }
+      this.invoiceService.getCurrentSession(filterStr).subscribe((res) => {
+        if (res.data === null) {
+          this.presentPrompt()
+          this.subjectService.setCanWithdraw('true')
+        } else {
+          this.subjectService.setSessionId(res.data.session_id);
+          this.subjectService.setSessionBalance(Number(res.data.session_amount));
+        }
+      })
+
+
+    }
+  }
+
+
+
+
+  async presentPrompt() {
+    let alert =await this.alertController.create({
+      header: 'Start your Session',
+      subHeader:'Enter an opening balance to start the day.',
+      mode: 'ios',
+      backdropDismiss: false,
+      inputs: [
+        {
+          name: 'amount',
+          placeholder: 'Opening Balance',
+          type: 'number'
+        },
+        {
+          name: 'expenseAmount',
+          placeholder: 'Expense Opening Balance',
+          type: 'number'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Submit',
+          handler: async data => {
+
+            if(data.amount && data.expenseAmount) {
+                          
+              let loader = await this.loading.create({
+                message: 'Please wait...',
+              });
+          
+              loader.present().then(() => {
+
+            
+                const obj = {
+                 session_status:'true',
+                 session_amount: Number(data.amount),
+                 user_name: this.userName,
+                 branch_id: this.branchId,
+                 branch_name: this.branchName,
+                 drawer_balance: Number(data.amount),
+                 expense_drawer_balance: Number(data.expenseAmount)
+                }
+ 
+                this.invoiceService.enterSessionAmount(obj).subscribe((res) => {
+                  this.getCurrentStatus();
+                  this.subjectService.setSessionId(res.data.session_id);
+                  this.subjectService.setSessionBalance(Number(res.data.session_amount));
+                     loader.dismiss();
+                },err => {
+                  loader.dismiss();
+ 
+                })
+              })
+            } else {
+              this.presentPrompt();
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async updateBill(data) {
+
+    let loader = await this.loading.create({
+      message: 'Please wait...',
+      duration: 3000
+    });
+
+    loader.present().then(() => {
+      this.invoiceService.updateBill(this.billDetail, this.billId).subscribe((res) => {
+        if (this.phone) {
+          this.domToI()
+          this.name = '';
+          this.address = '',
+            this.selectedPaymentMode = '';
+          this.selectedEmployee = '';
+          this.total = 0;
+          this.item = 0;
+          this.selectServiceCategory = ''
+          this.selectedBrandCategory = ''
+          this.selectedItems = [];
+          this.subCategoryList = [];
+          this.serviceList = [];
+          this.productList = [];
+          this.salonSelectedItems = [];
+          this.appointmentId = '';
+          this.booking_amount = 0;
+          loader.dismiss()
+        } else {
+          this.phone = '';
+          this.total = null;
+          this.toggleCategory();
+          this.name = '';
+          this.address = '',
+            this.selectedPaymentMode = '';
+          this.selectedEmployee = '';
+          this.total = 0;
+          this.item = 0;
+          this.selectServiceCategory = ''
+          this.selectedBrandCategory = ''
+          this.selectedItems = [];
+          this.subCategoryList = [];
+          this.selectedItems = [];
+          this.subCategoryList = [];
+          this.serviceList = [];
+          this.productList = [];
+          this.salonSelectedItems = [];
+          this.appointmentId = '';
+          this.booking_amount = 0;
+          loader.dismiss()
+        }
+
+        this.netBanking = false
+        this.router.navigate(['/con/billing-list'])
+
+      }, err => loader.dismiss())
+
+      loader.dismiss()
+    })
+
+
+  }
+
+
+  async domToI() {
+    let loader = await this.loading.create({
+      message: 'Generating Updated Bill...',
+    });
+
+    loader.present().then(() => {
+
       let markup = document.getElementById('bill');
-       domtoimage.toBlob(markup).then((blob) => {
+      domtoimage.toBlob(markup).then((blob) => {
         const name = new Date().getTime() + '.png';
-         console.log(blob)
         let form = new FormData()
         form.append('pdf', blob, name);
         this.invoiceService.uploadPdf(form).subscribe((res) => {
-          console.log('here')
-           if(res) { 
-             this.socialSharing.shareViaWhatsAppToReceiver(`+91${this.billDetail.customer_phone}`,`HABIB SALON,
-             please click the link below to see your bill. Thank You Visit again`,`https://api.ahsalons.in/${res.path}`, `https://api.ahsalons.in/${res.path}`)
-             this.phone = '';
-             this.router.navigate(['/con/billing-list'])
-             loader.dismiss()
-           }
-           loader.dismiss()
+          if (res) {
+            if (this.branchDetail.branch_id === 'Pr4sCmLyx' || this.branchDetail.branch_name === 'Hair Express Salon & Academy') {
+              this.socialSharing.shareViaWhatsAppToReceiver(
+                `+91${this.phone}`,
+                `Hair Express Salon & Academy,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/CQyJdm9pCn9zEAI/review`,
+              );
+            } else if (this.branchDetail.branch_id === 'fVj4BG0fF' || this.branchDetail.branch_name === 'Airport Habibb') {
+              this.socialSharing.shareViaWhatsAppToReceiver(
+                `+91${this.phone}`,
+                `Airport Habibb,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/Cc7xvDTs5ndKEAI/review`,
+              );
+            } else if (this.branchDetail.branch_id === 'KOhOskJLG' || this.branchDetail.branch_name === 'Sodepur Habibb') {
+              this.socialSharing.shareViaWhatsAppToReceiver(
+                `+91${this.phone}`,
+                `Sodepur Habibb,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/CYXEX55WmKCDEAI/review`,
+              );
+            } else if (this.branchDetail.branch_id === 'gW0vfq11U' || this.branchDetail.branch_name === 'A&h Salon & Academy') {
+              this.socialSharing.shareViaWhatsAppToReceiver(
+                `+91${this.phone}`,
+                `A&h Salon & Academy,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/CciUQ3KvCbzOEAI/review`,
+              );
+            } else if (this.branchDetail.branch_id === 'F9KZrn7vt' || this.branchDetail.branch_name === 'Hair Express Belghoria Salon And Academy') {
+              this.socialSharing.shareViaWhatsAppToReceiver(
+                `+91${this.phone}`,
+                `Hair Express Belghoria Salon And Academy,\nplease click on the link below to view your bill and Save the number.\nBill Link: https://api.ahsalons.in/${res.path}\n\nThank You! Visit again\nEnjoyed our service? Leave us a review here: https://g.page/r/Cckxbz85-i8AEAI/review`,
+              );
+            } else {
+              this.socialSharing.shareViaWhatsAppToReceiver(`+91${this.phone}`, `HABIB SALON,
+            please click on the link below to view your bill and Save the number. Thank You Visit again`, `https://api.ahsalons.in/${res.path}`, `https://api.ahsalons.in/${res.path}`)
+            }
+            this.phone = '';
+            this.toggleCategory();
+            loader.dismiss()
+          }
+          loader.dismiss()
         })
       })
-       .catch(function (error) {
-        console.error('oops, something went wrong!', error);
-        loader.dismiss()
+        .catch(function (error) {
+          loader.dismiss()
         });
     })
   }
+
+  transformDate(
+    isoDate: string,
+    locale: string = 'en-US'
+  ): string {
+    if (!isoDate) return '';
+  
+    const date = new Date(isoDate);
+  
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric'
+    }).format(date);
+  }
+
 
 
 

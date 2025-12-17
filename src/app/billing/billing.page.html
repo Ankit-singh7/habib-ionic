@@ -382,6 +382,31 @@
         <ion-input type="text" placeholder="" [(ngModel)]="address" name="address"></ion-input>
       </ion-item>
 
+      <ion-item mode="ios" lines="full" >
+        <ion-label mode="ios"  position="stacked"style="color: #2c3847;" >Feedback (optional) </ion-label>
+        <ion-input type="text" placeholder="" [(ngModel)]="feedback" name="feedback"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label>Date of Birth (optional)</ion-label>
+      <ion-datetime
+        presentation="date"
+        [(ngModel)]="dob"
+        [max]="today"
+        placeholder="Select DOB">
+      </ion-datetime>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label>Anniversary (optional)</ion-label>
+      <ion-datetime
+        presentation="date"
+        [(ngModel)]="anniversary"
+        [max]="today"
+        placeholder="Select Anniversary Date">
+      </ion-datetime>
+    </ion-item>
+
       <ion-item mode="ios" lines="full">
         <ion-label mode="ios" position="stacked" style="color: #2c3847;"> Appointment ID (optional)</ion-label>
         <div class="input-container">
@@ -686,6 +711,15 @@
         <p style="font-size:11px"><span style="font-weight: bold;">Address</span>:
           {{billDetail.customer_address?billDetail.customer_address: ''}}</p>
       </div>
+      <div style="border-bottom:1px dotted black;height:14px;" *ngIf="billDetail?.dob">
+        <p style="font-size:11px"><span style="font-weight: bold;">DOB</span>: {{transformDate(billDetail?.dob)}}</p>
+       </div>
+       <div style="border-bottom:1px dotted black;height:14px;" *ngIf="billDetail?.anniversary">
+        <p style="font-size:11px"><span style="font-weight: bold;">Anniversary</span>: {{transformDate(billDetail?.anniversary)}}</p>
+       </div>
+       <div style="border-bottom:1px dotted black;height:14px;" *ngIf="billDetail?.feedback">
+        <p style="font-size:11px"><span style="font-weight: bold;">feedback</span>: {{billDetail?.feedback}}</p>
+       </div>
       <ng-container *ngIf="servArr.length">
 
         <div style="display:inline-block;width:47%;border:1px solid grey;height:25px;margin-left:1%">

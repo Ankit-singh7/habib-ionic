@@ -17,10 +17,6 @@ const routes: Routes = [
   {
     path: 'con',
     loadChildren: () => import('./container/container.module').then( m => m.ContainerPageModule)
-  },
-  {
-    path: 'edit-bill',
-    loadChildren: () => import('./edit-bill/edit-bill.module').then( m => m.EditBillPageModule)
   }
 ];
 

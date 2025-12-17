@@ -57,4 +57,21 @@ export class BillingViewPage implements OnInit {
     })
   }
 
+
+transformDate(
+  isoDate: string,
+  locale: string = 'en-US'
+): string {
+  if (!isoDate) return '';
+
+  const date = new Date(isoDate);
+
+  return new Intl.DateTimeFormat(locale, {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric'
+  }).format(date);
+}
+
+
 }

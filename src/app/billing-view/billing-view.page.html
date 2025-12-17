@@ -41,6 +41,21 @@
         <p>Address: <b>{{billDetail.customer_address?billDetail.customer_address: 'Not Provided'}}</b></p>
       </ion-label>
    </ion-item>
+   <ion-item lines="full">
+    <ion-label>
+      <p>Feedback: <b>{{billDetail?.feedback ? billDetail.feedback : 'Not Provided'}}</b></p>
+    </ion-label>
+  </ion-item>
+  <ion-item lines="full">
+    <ion-label>
+      <p>DOB: <b>{{billDetail?.dob ? transformDate(billDetail.dob) : 'Not Provided'}}</b></p>
+    </ion-label>
+  </ion-item>
+  <ion-item lines="full">
+    <ion-label>
+      <p>Anniversary: <b>{{billDetail?.anniversary ? transformDate(billDetail.anniversary) : 'Not Provided'}}</b></p>
+    </ion-label>
+  </ion-item>
        </ng-container>
       <ion-item lines="full">
         <ion-label>

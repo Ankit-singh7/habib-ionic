@@ -41,6 +41,10 @@ const routes: Routes = [
       canActivate: [AuthService]
     },
     {
+      path: 'edit-bill',
+      loadChildren: () => import('../edit-bill/edit-bill.module').then( m => m.EditBillPageModule)
+    },
+    {
       path: 'session',
       loadChildren: () => import('../session/session.module').then( m => m.SessionPageModule),
       canActivate: [AuthService]

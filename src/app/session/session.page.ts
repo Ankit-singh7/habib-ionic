@@ -150,13 +150,18 @@ export class SessionPage extends RouterPage{
           placeholder: 'Opening Balance',
           type: 'number'
         },
+        {
+          name: 'expenseAmount',
+          placeholder: 'Expense Opening Balance',
+          type: 'number'
+        },
       ],
       buttons: [
         {
           text: 'Submit',
           handler: async data => {
 
-            if(data.amount) {
+            if(data.amount && data.expenseAmount) {
                           
               let loader = await this.loading.create({
                 message: 'Please wait...',
@@ -171,7 +176,8 @@ export class SessionPage extends RouterPage{
                  user_name: this.userName,
                  branch_id: this.branchId,
                  branch_name: this.branchName,
-                 drawer_balance: Number(data.amount)
+                 drawer_balance: Number(data.amount),
+                 expense_drawer_balance: Number(data.expenseAmount)
                 }
  
                 this.invoiceService.enterSessionAmount(obj).subscribe((res) => {

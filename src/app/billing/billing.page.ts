@@ -57,6 +57,9 @@ export class BillingPage extends RouterPage {
   public employeeList = [];
   public branchDetail;
   public billCount;
+  public dob: string;
+  public feedback: string;
+  public anniversary: string;
 
   payment = [];
 
@@ -906,6 +909,7 @@ export class BillingPage extends RouterPage {
 
   checkValidation() {
     this.formError = false;
+    let billId = `CH-${generate()}`;
     if (!this.selectedPaymentMode && !this.dual_payment) {
       this.message = 'Payment mode is required.'
       this.formError = true;
@@ -915,7 +919,20 @@ export class BillingPage extends RouterPage {
     } else if (!this.totalInput) {
       this.message = 'Total Bill Amount is required'
       this.formError = true;
+    } else if (this.split_amount_1 && this.split_amount_2) {
+      const totalSplitAmount = +this.split_amount_1 + +this.split_amount_2
+        if( totalSplitAmount !== this.totalInput) {
+          this.message = 'split amounts sum is not same as total amount'
+          this.formError = true;
     } else {
+      this.formError = false;
+  if (this.appointmentId) {
+    this.findCustomerBookingDetail(billId)
+  } else {
+    this.showGenerateBill(billId);
+  }
+    }
+  } else {
       this.formError = false;
       let billId = `CH-${generate()}`;
       if (this.appointmentId) {
@@ -965,6 +982,9 @@ export class BillingPage extends RouterPage {
       if (!item.employee_id && !item.employee_name) {
         this.not_valid_employee = true
         this.message = 'Please select employee'
+      } else if(item.total === null) {
+        this.not_valid_employee = true
+        this.message = 'Please enter total of all the service/product'
       } else {
         this.not_valid_employee = false
         this.message = ''
@@ -1047,8 +1067,10 @@ export class BillingPage extends RouterPage {
         appointment_id: this.appointmentId,
         products: this.prodArr,
         services: this.servArr,
-        dual_payment_mode: this.dual_payment
-
+        dual_payment_mode: this.dual_payment,
+        dob: this.dob,
+        anniversary: this.anniversary,
+        feedback: this.feedback
       }
     } else if (this.dual_payment) {
       data = {
@@ -1074,7 +1096,10 @@ export class BillingPage extends RouterPage {
         appointment_id: this.appointmentId,
         products: this.prodArr,
         services: this.servArr,
-        dual_payment_mode: this.dual_payment
+        dual_payment_mode: this.dual_payment,
+        dob: this.dob,
+        anniversary: this.anniversary,
+        feedback: this.feedback
 
       }
     }
@@ -1138,9 +1163,9 @@ export class BillingPage extends RouterPage {
 
 
   async presentPrompt() {
-    let alert = await this.alertController.create({
+    let alert =await this.alertController.create({
       header: 'Start your Session',
-      subHeader: 'Enter an opening balance to start the day.',
+      subHeader:'Enter an opening balance to start the day.',
       mode: 'ios',
       backdropDismiss: false,
       inputs: [
@@ -1149,37 +1174,44 @@ export class BillingPage extends RouterPage {
           placeholder: 'Opening Balance',
           type: 'number'
         },
+        {
+          name: 'expenseAmount',
+          placeholder: 'Expense Opening Balance',
+          type: 'number'
+        },
       ],
       buttons: [
         {
           text: 'Submit',
           handler: async data => {
 
-            if (data.amount) {
-
+            if(data.amount && data.expenseAmount) {
+                          
               let loader = await this.loading.create({
                 message: 'Please wait...',
               });
-
+          
               loader.present().then(() => {
 
-
+            
                 const obj = {
-                  session_status: 'true',
-                  session_amount: Number(data.amount),
-                  user_name: this.userName,
-                  branch_id: this.branchId,
-                  branch_name: this.branchName,
-                  drawer_balance: Number(data.amount)
+                 session_status:'true',
+                 session_amount: Number(data.amount),
+                 user_name: this.userName,
+                 branch_id: this.branchId,
+                 branch_name: this.branchName,
+                 drawer_balance: Number(data.amount),
+                 expense_drawer_balance: Number(data.expenseAmount)
                 }
-
+ 
                 this.invoiceService.enterSessionAmount(obj).subscribe((res) => {
+                  this.getCurrentStatus();
                   this.subjectService.setSessionId(res.data.session_id);
-                  this.subjectService.setSessionBalance(res.data.session_amount);
+                  this.subjectService.setSessionBalance(Number(res.data.session_amount));
+                     loader.dismiss();
+                },err => {
                   loader.dismiss();
-                }, err => {
-                  loader.dismiss();
-
+ 
                 })
               })
             } else {
@@ -1309,5 +1341,21 @@ export class BillingPage extends RouterPage {
         });
     })
   }
+
+
+transformDate(
+  isoDate: string,
+  locale: string = 'en-US'
+): string {
+  if (!isoDate) return '';
+
+  const date = new Date(isoDate);
+
+  return new Intl.DateTimeFormat(locale, {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric'
+  }).format(date);
+}
 
 }

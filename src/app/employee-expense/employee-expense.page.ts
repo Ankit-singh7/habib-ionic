@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, TRANSLATIONS } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { RouterPage } from '../dashboard/router.page';
 import { Platform, LoadingController, AlertController } from '@ionic/angular';
 import { InvoiceService } from '../services/invoice/invoice.service';
@@ -29,6 +29,7 @@ export class EmployeeExpensePage extends RouterPage{
   expenseAmount: number | null = null;
   buttonText: string = 'Save';
   expenseId: any;
+  expenses: any;
 
   constructor(private platform: Platform,
     private invoiceService: InvoiceService,
@@ -135,13 +136,18 @@ export class EmployeeExpensePage extends RouterPage{
           placeholder: 'Opening Balance',
           type: 'number'
         },
+        {
+          name: 'expenseAmount',
+          placeholder: 'Expense Opening Balance',
+          type: 'number'
+        },
       ],
       buttons: [
         {
           text: 'Submit',
           handler: async data => {
 
-            if(data.amount) {
+            if(data.amount && data.expenseAmount) {
                           
               let loader = await this.loading.create({
                 message: 'Please wait...',
@@ -156,7 +162,8 @@ export class EmployeeExpensePage extends RouterPage{
                  user_name: this.userName,
                  branch_id: this.branchId,
                  branch_name: this.branchName,
-                 drawer_balance: Number(data.amount)
+                 drawer_balance: Number(data.amount),
+                 expense_drawer_balance: Number(data.expenseAmount)
                 }
  
                 this.invoiceService.enterSessionAmount(obj).subscribe((res) => {
@@ -179,55 +186,110 @@ export class EmployeeExpensePage extends RouterPage{
     await alert.present();
   }
 
-  async saveEditExpense() {
-      if(this.expenseAmount && this.expenseDescription) {
-        const expenseData = {
-          employee_id: this.userId,
-          expense_reason: this.expenseDescription,
-          expense_amount: this.expenseAmount,
-          employee_name: this.userName,
-          branch_id: this.branchId,
-          branch_name: this.branchName,
-        };
-        let loader = await this.loading.create({
-          message: 'Please wait...',
-        });
-        loader.present().then(() => {
-          if(this.buttonText === 'Save') {
-            this.userService.saveEmployeeExpensesDetail(expenseData).subscribe((res) => {
-              this.router.navigate(['/con/dashboard']);
-                loader.dismiss();
-            }, err=> loader.dismiss())
-          } else {
-            this.userService.updateEmployeeExpensesDetail(expenseData, this.expenseId).subscribe((res) => {
-              this.router.navigate(['/con/dashboard']);
-              loader.dismiss();
-          }, err=> loader.dismiss())
-          }
-        })
-      }   
-  }
-
-  async getEmployeeExpenseDetail(id, createdOn){
+  async getEmployeeExpenseDetail(id, createdOn) {
     let loader = await this.loading.create({
       message: 'Please wait...',
     });
-    // loader.present().then(() => {
-      this.userService.getEmployeeExpensesDetail(id, createdOn).subscribe((res) => {
-        if(res.data.expense_amount && res.data.expense_reason){
-            this.expenseAmount = res.data.expense_amount;
-            this.expenseDescription = res.data.expense_reason;
-            this.expenseId = res.data.expense_id;
-            this.buttonText = 'Edit';
-            loader.dismiss();
-        } else {
-          this.buttonText = 'Save';
-          loader.dismiss();
-        }
+    loader.present();
 
-      }, err => loader.dismiss())
-    // })
+    this.userService.getEmployeeExpensesDetail(id, createdOn).subscribe(
+      (res) => {
+        if (res.data?.expenses && res.data?.expenses.length > 0) {
+          this.expenses = res.data.expenses;
+          this.expenseId = res.data.expense_id;
+          this.buttonText = 'Edit';
+        } else {
+          this.expenses = [{ expense_reason: '', expense_amount: '' , in_amount: '', drawer_balance: null, closing_balance: null}]; // Default single field
+          this.buttonText = 'Save';
+        }
+        loader.dismiss();
+      },
+      (err) => loader.dismiss()
+    );
   }
+
+  addNewExpense() {
+    this.expenses.push({ expense_reason: '', expense_amount: '' , in_amount: '', drawer_balance: null, closing_balance: null});
+  }
+
+  removeExpense(index: number) {
+      this.expenses.splice(index, 1);
+  }
+
+  async saveEditExpense() {
+    if (this.expenses.length === 0) return;
+  
+    const loader = await this.loading.create({
+      message: 'Please wait...',
+    });
+    await loader.present();
+  
+    try {
+      const hasInAmount = this.expenses.some(
+        (e) => e.in_amount && Number(e.in_amount) > 0
+      );
+      const hasExpenseAmount = this.expenses.some(
+        (e) => e.expense_amount && Number(e.expense_amount) > 0
+      );
+  
+      // Get current drawer balance from session
+      const openingBalance = this.sessionDetail?.expense_drawer_balance || 0;
+  
+      // Calculate total in_amount and expense_amount
+      const totalInAmount = this.expenses.reduce(
+        (sum, e) => sum + (Number(e.in_amount) || 0),
+        0
+      );
+      const totalExpenseAmount = this.expenses.reduce(
+        (sum, e) => sum + (Number(e.expense_amount) || 0),
+        0
+      );
+  
+      // Compute closing balance
+      const closingBalance = openingBalance + totalInAmount - totalExpenseAmount;
+  
+      // ✅ Add balances to first object in expenses array
+      if (this.expenses.length > 0) {
+        this.expenses[0].drawer_balance = openingBalance;
+        this.expenses[0].closing_balance = closingBalance;
+      }
+  
+      // Prepare expense payload
+      const expenseData = {
+        employee_id: this.userId,
+        expenses: this.expenses,
+        employee_name: this.userName,
+        branch_id: this.branchId,
+        branch_name: this.branchName,
+      };
+  
+      // ✅ Update session balance if necessary
+      // if (hasInAmount || hasExpenseAmount) {
+      //   const sessionUpdateData = {
+      //     expense_drawer_balance: closingBalance,
+      //   };
+      //   await this.invoiceService
+      //     .updateSession(sessionUpdateData, this.sessionDetail.session_id)
+      //     .toPromise();
+      // }
+  
+      // ✅ Save or update expenses
+      if (this.buttonText === 'Save') {
+        await this.userService.saveEmployeeExpensesDetail(expenseData).toPromise();
+      } else {
+        await this.userService
+          .updateEmployeeExpensesDetail(expenseData, this.expenseId)
+          .toPromise();
+      }
+  
+      this.router.navigate(['/con/dashboard']);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      loader.dismiss();
+    }
+  }
+  
 
 
 }
