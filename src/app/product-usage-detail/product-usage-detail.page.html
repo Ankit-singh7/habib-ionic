@@ -39,14 +39,18 @@
                 
                       <ion-card-content>
                         <ion-row>
-                          <p class="selected-product">
+                          <!-- brand dropdown -->
+                          <ionic-selectable style="margin-left:16px;" [(ngModel)]="usage.brand" placeholder="Select Brand"
+                            class="employee-dropdown-amount" [items]="brandList" itemValueField="brand_id" itemTextField="name" [canSearch]="true"
+                            (onChange)="onBrandSelect($event, usage)">
+                          </ionic-selectable>
+                          <!-- <p class="selected-product">
                             {{ isString(usage.name) ? usage.name : '' }}
-                          </p>
+                          </p>                         -->
                           <!-- Product Dropdown -->
                           <ion-col size="12">
                             <ionic-selectable
-                              style="margin-left:16px;"
-                              [(ngModel)]="usage.name"
+                              style="margin-left:5px;"
                               placeholder="Select Product"
                               class="employee-dropdown-amount"
                               [items]="productList"
@@ -54,6 +58,8 @@
                               itemTextField="name"
                               [canSearch]="true"
                               headerColor="danger"
+                              [disabled]="!usage.brand"
+                              [(ngModel)]="usage.product_id"
                               >
                               
                               <ng-template ionicSelectableCloseButtonTemplate>

@@ -20,6 +20,9 @@ export class ProductUsageDetailPage implements OnInit {
   public date: any;
   public role = localStorage.getItem('role');
   public productList = [];
+  emptyMessage: string;
+  brandList: any;
+  selectedBrandId: string | null = null;
   constructor(
     private invoiceService: InvoiceService,
     private loading: LoadingController,
@@ -27,10 +30,10 @@ export class ProductUsageDetailPage implements OnInit {
     private subjectService: SubjectService,
     private menuService: MenuService,
     private route: ActivatedRoute) { 
-      this.route.queryParams.subscribe(params => {
+      this.route.queryParams.subscribe(async params => {
            this.billId = params['id'];
+           await this.getBrand();  
            this.getBillDetail(this.billId)
-           this.getProductList();
       })
       this.subjectService.getRole().subscribe((res) => {
           this.role = res
@@ -56,7 +59,12 @@ export class ProductUsageDetailPage implements OnInit {
             ...item,
             product_usage_detail:
             Array.isArray(item.product_usage_detail) && item.product_usage_detail.length > 0
-              ? item.product_usage_detail
+              ? item.product_usage_detail.map((pud) => {
+                return{
+                ...pud,
+                brand: this.brandList?.find(b => b.brand_id === pud.brand_id) || null,
+                product: this.productList?.find(p => p.product_id === pud.product_id) || null
+              }})
               : [
                   {
                     name: '',
@@ -76,22 +84,79 @@ export class ProductUsageDetailPage implements OnInit {
     })
   }
 
-  getProductList() {
-    this.menuService.getAllProduct().subscribe((res) => {
-      this.productList = res.data.map((item) => ({
-        name: item.name,
-        quantity: '',
-        unit: item.uom,
-        product_id: item.product_id
-      }));
+  getProductList() : Promise<void>  {
+    return  new Promise((resolve) => {
+      this.menuService.getAllProduct().subscribe((res) => {
+        this.productList = res.data.map((item) => ({
+          name: item.name,
+          quantity: '',
+          unit: item.uom,
+          product_id: item.product_id
+        }));
+        resolve();
+      })
     })
   }
+
+
+  getBrand(): Promise<void> {
+    return new Promise((resolve) => {
+      this.menuService.getAllBrand().subscribe((res) => {
+        this.brandList = res.data;
+        resolve();
+      });
+    });
+  }
+  
+
+  async getProductListbyBrand(id) {
+    this.productList = [];
+    let loader = await this.loading.create({
+      message: 'Please wait...',
+    });
+
+    loader.present().then(() => {
+      this.menuService.getProductByBrand(id).subscribe((res) => {
+        if (res.data) {
+
+          this.productList = res.data.map((item) => ({
+            name: item.name,
+            quantity: '',
+            unit: item.uom,
+            product_id: item.product_id
+          }));
+        } else {
+          this.emptyMessage = 'No items found.'
+        }
+
+        loader.dismiss();
+
+      }, err => loader.dismiss())
+    })
+  }
+
+  onBrandSelect(event: any, usage: any) {
+    const brand = event?.value;
+  
+    // Reset ONLY current usage product
+    usage.name = '';
+  
+    // Load product list for selected brand
+    if (brand?.brand_id) {
+      this.getProductListbyBrand(brand.brand_id);
+    } else {
+      this.productList = [];
+    }
+  }
+  
+  
 
   addMoreProduct(item: any) {
     item.product_usage_detail.push({
       name: '',
       quantity: '',
       product_id: '',
+      brand_id: '',
       unit: ''
     });
   }
@@ -101,13 +166,14 @@ export class ProductUsageDetailPage implements OnInit {
       service.product_usage_detail = service.product_usage_detail
         .map((item) => {
           const isNameObject = typeof item.name === "object" && item.name !== null;
-          const name = isNameObject ? item.name.name : item.name;
-          const product_id = isNameObject ? item.name.product_id : item.product_id;
-          const unit = isNameObject ? item.name.unit : item.unit;
+          const name = !isNameObject ? item.product.name : item.name;
+          const product_id = !isNameObject ? item.product.product_id : item.product_id;
+          const unit = !isNameObject ? item.product.unit : item.unit;
   
           return {
             name: name || "",
             product_id: product_id || "",
+            brand_id: item.brand?.brand_id || item.brand_id || "",
             quantity: item.quantity || "",
             unit: unit || ""
           };
